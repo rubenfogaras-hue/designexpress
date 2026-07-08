@@ -34,4 +34,7 @@ dev-err.log
 dev-out.log
 
 # personal/local Claude Code settings (not shared)
-.claude/settings.local.json
+.claude/
+
+.vercel
+.env*
