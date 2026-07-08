@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Horizont Visuals base ──────────────────────────────────────────── */
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #f6f1e8; /* warm ivory — never pure white */
+  color: #3d4255;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(176, 138, 74, 0.22);
+}
+
+/* Reveal-on-scroll (12px rise + fade) is driven by GSAP ScrollTrigger — see
+   components/Reveal.tsx and lib/gsap.ts. Content stays visible without JS. */
+
+/* ── Interaction states (calm, eased — no bounce) ────────────────────── */
+.hv-input {
+  transition: border-color 0.35s cubic-bezier(0.22, 0.36, 0, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 0.36, 0, 1);
+}
+.hv-input:focus {
+  outline: none;
+  border-color: #b08a4a;
+  box-shadow: 0 0 0 3px rgba(176, 138, 74, 0.18);
+}
+
+.hv-dropzone {
+  transition: border-color 0.35s cubic-bezier(0.22, 0.36, 0, 1),
+    background 0.35s cubic-bezier(0.22, 0.36, 0, 1);
+}
+.hv-dropzone:hover,
+.hv-dropzone.is-dragging {
+  border-color: #b08a4a;
+  background: #f7f1e4;
+}
+
+.hv-cta {
+  transition: background 0.35s cubic-bezier(0.22, 0.36, 0, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 0.36, 0, 1);
+}
+.hv-cta:hover:not(:disabled) {
+  background: #283250;
+  box-shadow: 0 6px 20px rgba(20, 22, 32, 0.16);
+}
+.hv-cta:active:not(:disabled) {
+  background: #12182a;
+}
+.hv-cta:disabled {
+  cursor: default;
+  opacity: 0.92;
+}
+
+.hv-remove {
+  transition: color 0.25s cubic-bezier(0.22, 0.36, 0, 1);
+}
+.hv-remove:hover {
+  color: #b0492f;
+}
+
+.hv-link {
+  transition: color 0.25s cubic-bezier(0.22, 0.36, 0, 1);
+}
+.hv-link:hover {
+  color: #1b2236;
+}
+
+.hv-lift {
+  transition: box-shadow 0.45s cubic-bezier(0.22, 0.36, 0, 1),
+    transform 0.45s cubic-bezier(0.22, 0.36, 0, 1);
+}
+.hv-lift:hover {
+  box-shadow: 0 14px 40px rgba(20, 22, 32, 0.12);
+}
