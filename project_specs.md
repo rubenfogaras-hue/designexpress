@@ -32,18 +32,24 @@ funnel, nothing more.
 
 ## Pages & user flows (all public)
 
-| Route                             | Type    | Purpose                                             |
-| --------------------------------- | ------- | --------------------------------------------------- |
-| `/`                               | Static  | The opt-in page (hero pitch + offer form).          |
-| `/multumire`                      | Dynamic | Thank-you page. Stripe's `success_url`. Verifies the session server-side. |
-| `/api/create-checkout-session`    | Dynamic | POST: validates the order, stores photos, creates the Stripe session, returns `{ url }`. |
+| Route                | Type    | Purpose                                             |
+| -------------------- | ------- | ---------------------------------------------------- |
+| `/`                  | Static  | The opt-in page (hero pitch + offer form).          |
+| `/multumire`         | Dynamic | Optional thank-you page. Only used if the Stripe Payment Link's "after payment" redirect is pointed here — Stripe appends `?session_id=…`, which this page verifies server-side. Otherwise Stripe shows its own built-in confirmation. |
+| `/api/submit-order`  | Dynamic | POST: validates the order, stores photos + note locally, returns `{ orderId }`. Does not talk to Stripe. |
 
-**Happy path:** fill form → click CTA → `POST /api/create-checkout-session` →
-redirect to Stripe → pay → Stripe redirects to `/multumire?session_id=…`.
+**Happy path:** fill form → click CTA → `POST /api/submit-order` (saves photos +
+info) → redirect to the Stripe **Payment Link** (`client_reference_id` = orderId,
+`prefilled_email` = customer email) → pay on Stripe's hosted page → Stripe shows
+its own confirmation (or redirects to `/multumire` if configured).
 
 **Error paths:** invalid name/email/consent → `400` with a Romanian message shown
-under the button; Stripe/network failure → `500` with a generic Romanian message;
-photo storage failure never blocks payment (logged, skipped).
+under the button; photo storage failure never blocks the order (logged, skipped).
+
+**Matching payments to orders:** the Payment Link doesn't call back to this app,
+so to connect a paid order to its photos, look up the payment in the Stripe
+Dashboard and check its `client_reference_id` — it matches the folder name under
+`uploads/<orderId>/`.
 
 ## Data models & where data is stored
 
@@ -53,9 +59,11 @@ No database. Per order we capture:
 name, email, note (≤300 chars), consent, photos[] (≤5, JPG/PNG)
 ```
 
-- **Order metadata** (name, email, note, photo count, orderId) → Stripe session
-  `metadata` + a local `uploads/<orderId>/order.json`.
+- **Order metadata** (name, email, note, photo list) → local
+  `uploads/<orderId>/order.json`.
 - **Photos** → saved to `uploads/<orderId>/` on the server (see below).
+- **Payment** → handled entirely by the Stripe Payment Link, tagged with the
+  same `orderId` via `client_reference_id`.
 
 ## Photo storage — important
 
@@ -64,7 +72,7 @@ dev but not on Vercel**, where the filesystem is ephemeral/read-only. The write 
 wrapped in try/catch so a failure is logged and payment still completes.
 
 **Production upgrade path:** swap the filesystem write in
-`app/api/create-checkout-session/route.ts` for **Supabase Storage** (matches the
+`app/api/submit-order/route.ts` for **Supabase Storage** (matches the
 house stack) or Vercel Blob / S3. Store a signed reference, not a public URL.
 
 ## Hero before/after photos

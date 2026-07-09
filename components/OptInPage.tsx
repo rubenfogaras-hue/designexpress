@@ -9,10 +9,13 @@ import { Reveal } from "./Reveal";
    Editorial-luxury: warm ivory canvas, deep navy, a thread of antique gold.
    Cormorant Garamond for soul, Inter for clarity. All copy in Romanian.
 
-   Flat offer: 49 € for up to 5 room photos. The CTA POSTs the order (name,
-   email, photos, note) to /api/create-checkout-session and redirects the
-   customer to Stripe Checkout.
+   Flat offer: 247 lei for up to 5 room photos. The CTA POSTs the order
+   (name, email, photos, note) to /api/submit-order, then sends the customer
+   to the Stripe Payment Link to pay — Stripe handles the payment page and
+   the confirmation after.
 ──────────────────────────────────────────────────────────────────────── */
+
+const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/14A9AMb1B4Zg50zfpV3F600";
 
 const MAX_IMAGES = 5;
 const NOTE_LIMIT = 300;
@@ -98,7 +101,7 @@ export default function OptInPage() {
       fd.append("consent", String(consent));
       images.forEach((file) => fd.append("photos", file, file.name));
 
-      const res = await fetch("/api/create-checkout-session", {
+      const res = await fetch("/api/submit-order", {
         method: "POST",
         body: fd,
       });
@@ -106,15 +109,20 @@ export default function OptInPage() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(
-          data.error || "Nu am putut iniția plata. Încearcă din nou."
+          data.error || "Nu am putut înregistra comanda. Încearcă din nou."
         );
       }
 
-      const { url } = await res.json();
-      if (!url) throw new Error("Sesiunea de plată nu a putut fi creată.");
+      const { orderId } = await res.json();
+      if (!orderId) throw new Error("Comanda nu a putut fi înregistrată.");
 
-      // Hand off to Stripe Checkout (hosted).
-      window.location.href = url;
+      // Hand off to Stripe's Payment Link to collect payment. Tagging the
+      // order id + email lets us match the Stripe payment back to the
+      // photos/note we just saved.
+      const payUrl = new URL(STRIPE_PAYMENT_LINK);
+      payUrl.searchParams.set("client_reference_id", orderId);
+      payUrl.searchParams.set("prefilled_email", email);
+      window.location.href = payUrl.toString();
     } catch (err) {
       setError(err instanceof Error ? err.message : "A apărut o eroare.");
       setSubmitting(false);
