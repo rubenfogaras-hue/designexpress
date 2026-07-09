@@ -10,19 +10,28 @@ import { getSupabaseBrowser } from "@/lib/supabase/browser";
    Editorial-luxury: warm ivory canvas, deep navy, a thread of antique gold.
    Cormorant Garamond for soul, Inter for clarity. All copy in Romanian.
 
-   Flat offer: 247 lei for up to 5 room photos. The CTA:
+   Flat offer: 247 lei for up to 4 room photos, one per labeled slot (living,
+   bucătărie, baie, dormitor) so it's clear which photo is which room once
+   it lands in storage. The CTA:
      1. POSTs name/email/note/photo metadata (JSON, no file bytes) to
         /api/submit-order, which saves the order in Supabase and returns a
         signed upload URL per photo.
      2. Uploads each photo straight from the browser to Supabase Storage
-        (bypasses Vercel's ~4.5MB request body limit).
+        (bypasses Vercel's ~4.5MB request body limit), named after its room.
      3. Sends the customer to the Stripe Payment Link to pay — Stripe
         handles the payment page and the confirmation after.
 ──────────────────────────────────────────────────────────────────────── */
 
 const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/14A9AMb1B4Zg50zfpV3F600";
 
-const MAX_IMAGES = 5;
+const ROOM_SLOTS = [
+  { key: "living", label: "Living" },
+  { key: "bucatarie", label: "Bucătărie" },
+  { key: "baie", label: "Baie" },
+  { key: "dormitor", label: "Dormitor" },
+] as const;
+type RoomKey = (typeof ROOM_SLOTS)[number]["key"];
+
 const NOTE_LIMIT = 300;
 const NOTE_WARN = 270;
 
@@ -51,33 +60,30 @@ const labelCaps: CSSProperties = {
 export default function OptInPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [images, setImages] = useState<File[]>([]);
+  const [images, setImages] = useState<Partial<Record<RoomKey, File>>>({});
   const [note, setNote] = useState("");
   const [consent, setConsent] = useState(false);
   const [consentError, setConsentError] = useState(false);
   const [showTip, setShowTip] = useState(false);
-  const [dragging, setDragging] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const canAddImg = images.length < MAX_IMAGES;
+  const filledCount = Object.keys(images).length;
   const noteColor = note.length >= NOTE_WARN ? "#b0492f" : "#9a8a64";
   const ctaLabel = submitting
     ? "Se redirecționează către plată…"
-    : "Vreau redesignul meu — 247 lei";
+    : "Vreau interiorul nou — 247 lei";
 
-  // ── image handling (up to 5, all included in the 49 €) ────────────────
-  const addImages = (fileList: FileList | null) => {
-    if (!fileList || !fileList.length) return;
-    const incoming = Array.from(fileList).filter((f) =>
-      ["image/jpeg", "image/png"].includes(f.type)
-    );
-    setImages((prev) => [...prev, ...incoming].slice(0, MAX_IMAGES));
+  // ── image handling · one labeled photo per room slot ────────────────
+  const setRoomImage = (room: RoomKey, file: File | null) => {
+    if (file && !["image/jpeg", "image/png"].includes(file.type)) return;
+    setImages((prev) => {
+      const next = { ...prev };
+      if (file) next[room] = file;
+      else delete next[room];
+      return next;
+    });
   };
-  const removeImage = (i: number) =>
-    setImages((prev) => prev.filter((_, x) => x !== i));
 
   const onNoteChange = (v: string) =>
     setNote(v.length > NOTE_LIMIT ? v.slice(0, NOTE_LIMIT) : v);
@@ -99,6 +105,11 @@ export default function OptInPage() {
 
     setSubmitting(true);
     try {
+      const selected = ROOM_SLOTS.filter((r) => images[r.key]).map((r) => ({
+        room: r.key,
+        file: images[r.key]!,
+      }));
+
       const res = await fetch("/api/submit-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -107,7 +118,7 @@ export default function OptInPage() {
           email,
           note,
           consent,
-          photos: images.map((file) => ({ name: file.name, type: file.type })),
+          photos: selected.map(({ room, file }) => ({ room, type: file.type })),
         }),
       });
 
@@ -127,7 +138,7 @@ export default function OptInPage() {
       if (uploads?.length) {
         const supabase = getSupabaseBrowser();
         await Promise.all(
-          images.map((file, i) => {
+          selected.map(({ file }, i) => {
             const upload = uploads[i];
             if (!upload) return Promise.resolve();
             return supabase.storage
@@ -485,163 +496,28 @@ export default function OptInPage() {
                   fontStyle: "italic",
                 }}
               >
-                {images.length}/5 incluse
+                {filledCount}/{ROOM_SLOTS.length} incluse
               </span>
             </div>
 
-            {/* multi-image dropzone · up to 5 room photos, all included */}
-            {canAddImg && (
-              <label
-                className={`hv-dropzone${dragging ? " is-dragging" : ""}`}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setDragging(false);
-                  addImages(e.dataTransfer?.files ?? null);
-                }}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragging(true);
-                }}
-                onDragLeave={() => setDragging(false)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 13,
-                  cursor: "pointer",
-                  border: "1px solid rgba(176,138,74,0.4)",
-                  borderRadius: 8,
-                  background: "#faf6ee",
-                  padding: 16,
-                  marginBottom: 10,
-                }}
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png"
-                  multiple
-                  onChange={(e) => {
-                    addImages(e.target.files);
-                    e.target.value = "";
-                  }}
-                  style={{
-                    position: "absolute",
-                    width: 1,
-                    height: 1,
-                    opacity: 0,
-                    pointerEvents: "none",
-                  }}
+            {/* one labeled slot per room, so photos stay identifiable */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 10,
+                marginBottom: 10,
+              }}
+            >
+              {ROOM_SLOTS.map((room) => (
+                <RoomPhotoSlot
+                  key={room.key}
+                  room={room}
+                  file={images[room.key] ?? null}
+                  onChange={(file) => setRoomImage(room.key, file)}
                 />
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  style={{ flex: "none" }}
-                >
-                  <path
-                    d="M12 16V4m0 0L8 8m4-4l4 4"
-                    stroke="#b08a4a"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
-                    stroke="#b08a4a"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <span style={{ fontSize: 13, color: "#5a5340", lineHeight: 1.4 }}>
-                  Trage pozele aici sau{" "}
-                  <span
-                    style={{
-                      color: "#b08a4a",
-                      textDecoration: "underline",
-                      textUnderlineOffset: 2,
-                    }}
-                  >
-                    alege
-                  </span>{" "}
-                  — până la 5<br />
-                  <span style={{ fontSize: 11.5, color: "#9a8a64" }}>
-                    JPG sau PNG · o poză pentru fiecare cameră
-                  </span>
-                </span>
-              </label>
-            )}
-
-            {/* selected files */}
-            {images.map((file, i) => (
-              <div
-                key={`${file.name}-${i}`}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 10,
-                  border: "1px solid rgba(176,138,74,0.5)",
-                  borderRadius: 6,
-                  background: "#f7f1e4",
-                  padding: "11px 13px",
-                  marginBottom: 8,
-                }}
-              >
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 9,
-                    fontSize: 13,
-                    color: "#1a1d2c",
-                    minWidth: 0,
-                  }}
-                >
-                  <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    style={{ flex: "none" }}
-                  >
-                    <path
-                      d="M20 6L9 17l-5-5"
-                      stroke="#b08a4a"
-                      strokeWidth="1.7"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <span
-                    style={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {file.name}
-                  </span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => removeImage(i)}
-                  aria-label={`Elimină ${file.name}`}
-                  className="hv-remove"
-                  style={{
-                    border: "none",
-                    background: "none",
-                    cursor: "pointer",
-                    color: "#9a8a64",
-                    fontSize: 13,
-                    flex: "none",
-                    padding: "2px 4px",
-                  }}
-                >
-                  ×
-                </button>
-              </div>
-            ))}
+              ))}
+            </div>
 
             <div
               style={{
@@ -991,4 +867,148 @@ function badgeStyle(pos: "top" | "bottom"): CSSProperties {
     borderRadius: 9999,
     border: `1px solid rgba(176,138,74,${isTop ? 0.4 : 0.5})`,
   };
+}
+
+/* ── one labeled upload slot per room ─────────────────────────────────────
+   Keeps each photo tied to its room from the moment it's picked, through
+   the filename it gets in Supabase Storage (e.g. "<orderId>/living.jpg"). */
+function RoomPhotoSlot({
+  room,
+  file,
+  onChange,
+}: {
+  room: { key: string; label: string };
+  file: File | null;
+  onChange: (file: File | null) => void;
+}) {
+  const [dragging, setDragging] = useState(false);
+
+  const pickFirst = (list: FileList | null) => {
+    if (!list || !list.length) return;
+    const f = list[0];
+    if (["image/jpeg", "image/png"].includes(f.type)) onChange(f);
+  };
+
+  if (file) {
+    return (
+      <div
+        style={{
+          border: "1px solid rgba(176,138,74,0.5)",
+          borderRadius: 8,
+          background: "#f7f1e4",
+          padding: "10px 12px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 6 }}>
+          <span style={{ ...labelCaps, marginBottom: 5 }}>{room.label}</span>
+          <button
+            type="button"
+            onClick={() => onChange(null)}
+            aria-label={`Elimină poza pentru ${room.label}`}
+            className="hv-remove"
+            style={{
+              border: "none",
+              background: "none",
+              cursor: "pointer",
+              color: "#9a8a64",
+              fontSize: 13,
+              flex: "none",
+              padding: "0 0 0 6px",
+            }}
+          >
+            ×
+          </button>
+        </div>
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
+            fontSize: 12.5,
+            color: "#1a1d2c",
+            minWidth: 0,
+          }}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style={{ flex: "none" }}>
+            <path
+              d="M20 6L9 17l-5-5"
+              stroke="#b08a4a"
+              strokeWidth="1.9"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {file.name}
+          </span>
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <label
+      className={`hv-dropzone${dragging ? " is-dragging" : ""}`}
+      onDrop={(e) => {
+        e.preventDefault();
+        setDragging(false);
+        pickFirst(e.dataTransfer?.files ?? null);
+      }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setDragging(true);
+      }}
+      onDragLeave={() => setDragging(false)}
+      style={{
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        justifyContent: "center",
+        gap: 6,
+        cursor: "pointer",
+        border: "1px solid rgba(176,138,74,0.4)",
+        borderRadius: 8,
+        background: "#faf6ee",
+        padding: "10px 12px",
+        minHeight: 64,
+      }}
+    >
+      <input
+        type="file"
+        accept="image/jpeg,image/png"
+        aria-label={`Adaugă poza pentru ${room.label}`}
+        onChange={(e) => {
+          pickFirst(e.target.files);
+          e.target.value = "";
+        }}
+        style={{
+          position: "absolute",
+          width: 1,
+          height: 1,
+          opacity: 0,
+          pointerEvents: "none",
+        }}
+      />
+      <span style={{ ...labelCaps, marginBottom: 0 }}>{room.label}</span>
+      <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#9a8a64" }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flex: "none" }}>
+          <path
+            d="M12 16V4m0 0L8 8m4-4l4 4"
+            stroke="#b08a4a"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+            stroke="#b08a4a"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </svg>
+        Adaugă poza
+      </span>
+    </label>
+  );
 }

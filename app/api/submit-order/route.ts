@@ -5,8 +5,11 @@ import { getSupabaseAdmin } from "@/lib/supabase/server";
 // Needs the Node runtime (crypto + the Supabase admin client).
 export const runtime = "nodejs";
 
-const MAX_PHOTOS = 5;
-const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+const ROOM_KEYS = ["living", "bucatarie", "baie", "dormitor"];
+const ALLOWED_TYPES: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+};
 const BUCKET = "design-express-photos";
 
 function isEmail(value: string): boolean {
@@ -43,20 +46,29 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    if (photos.length > MAX_PHOTOS) {
+    if (photos.length > ROOM_KEYS.length) {
       return NextResponse.json(
-        { error: `Poți încărca cel mult ${MAX_PHOTOS} poze.` },
+        { error: `Poți încărca cel mult ${ROOM_KEYS.length} poze.` },
         { status: 400 }
       );
     }
+    const seenRooms = new Set<string>();
     for (const photo of photos) {
+      const room = String(photo?.room ?? "");
       const type = String(photo?.type ?? "");
-      if (!ALLOWED_TYPES.includes(type)) {
+      if (!ROOM_KEYS.includes(room) || seenRooms.has(room)) {
+        return NextResponse.json(
+          { error: "Cameră necunoscută sau duplicată pentru o poză." },
+          { status: 400 }
+        );
+      }
+      if (!ALLOWED_TYPES[type]) {
         return NextResponse.json(
           { error: "Sunt acceptate doar imagini JPG sau PNG." },
           { status: 400 }
         );
       }
+      seenRooms.add(room);
     }
 
     const orderId = randomUUID();
@@ -64,12 +76,12 @@ export async function POST(req: NextRequest) {
 
     const supabase = getSupabaseAdmin();
 
-    // ── one signed upload URL per photo ────────────────────────────────
-    const uploads: { path: string; token: string; name: string }[] = [];
+    // ── one signed upload URL per photo, named after its room ──────────
+    const uploads: { path: string; token: string; room: string }[] = [];
     for (const photo of photos) {
-      const safeName =
-        String(photo.name ?? "photo").replace(/[^\w.\-]+/g, "_").slice(-120) || "photo";
-      const path = `${orderId}/${safeName}`;
+      const room = String(photo.room);
+      const ext = ALLOWED_TYPES[String(photo.type)];
+      const path = `${orderId}/${room}${ext}`;
       const { data, error } = await supabase.storage
         .from(BUCKET)
         .createSignedUploadUrl(path);
@@ -80,7 +92,7 @@ export async function POST(req: NextRequest) {
           { status: 502 }
         );
       }
-      uploads.push({ path, token: data.token, name: safeName });
+      uploads.push({ path, token: data.token, room });
     }
 
     // ── save the order record ───────────────────────────────────────
