@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.1",
+    "@supabase/supabase-js": "^2.110.1",
     "gsap": "^3.12.5",
     "next": "14.2.35",
     "react": "^18.3.1",

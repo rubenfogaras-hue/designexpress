@@ -3,16 +3,21 @@
 import { useRef, useState, type CSSProperties } from "react";
 import { CompassGlyph } from "./CompassGlyph";
 import { Reveal } from "./Reveal";
+import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 /* ────────────────────────────────────────────────────────────────────────
    Horizont Visuals — "Design Express" opt-in / order page.
    Editorial-luxury: warm ivory canvas, deep navy, a thread of antique gold.
    Cormorant Garamond for soul, Inter for clarity. All copy in Romanian.
 
-   Flat offer: 247 lei for up to 5 room photos. The CTA POSTs the order
-   (name, email, photos, note) to /api/submit-order, then sends the customer
-   to the Stripe Payment Link to pay — Stripe handles the payment page and
-   the confirmation after.
+   Flat offer: 247 lei for up to 5 room photos. The CTA:
+     1. POSTs name/email/note/photo metadata (JSON, no file bytes) to
+        /api/submit-order, which saves the order in Supabase and returns a
+        signed upload URL per photo.
+     2. Uploads each photo straight from the browser to Supabase Storage
+        (bypasses Vercel's ~4.5MB request body limit).
+     3. Sends the customer to the Stripe Payment Link to pay — Stripe
+        handles the payment page and the confirmation after.
 ──────────────────────────────────────────────────────────────────────── */
 
 const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/14A9AMb1B4Zg50zfpV3F600";
@@ -94,16 +99,16 @@ export default function OptInPage() {
 
     setSubmitting(true);
     try {
-      const fd = new FormData();
-      fd.append("name", name);
-      fd.append("email", email);
-      fd.append("note", note);
-      fd.append("consent", String(consent));
-      images.forEach((file) => fd.append("photos", file, file.name));
-
       const res = await fetch("/api/submit-order", {
         method: "POST",
-        body: fd,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          note,
+          consent,
+          photos: images.map((file) => ({ name: file.name, type: file.type })),
+        }),
       });
 
       if (!res.ok) {
@@ -113,8 +118,24 @@ export default function OptInPage() {
         );
       }
 
-      const { orderId } = await res.json();
+      const { orderId, uploads } = await res.json();
       if (!orderId) throw new Error("Comanda nu a putut fi înregistrată.");
+
+      // Upload each photo straight to Supabase Storage using the signed
+      // URL we just got back — must finish before navigating away, since
+      // leaving the page cancels any upload still in flight.
+      if (uploads?.length) {
+        const supabase = getSupabaseBrowser();
+        await Promise.all(
+          images.map((file, i) => {
+            const upload = uploads[i];
+            if (!upload) return Promise.resolve();
+            return supabase.storage
+              .from("design-express-photos")
+              .uploadToSignedUrl(upload.path, upload.token, file);
+          })
+        );
+      }
 
       // Hand off to Stripe's Payment Link to collect payment. Tagging the
       // order id + email lets us match the Stripe payment back to the
