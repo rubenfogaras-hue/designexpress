@@ -46,6 +46,12 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    if (photos.length === 0) {
+      return NextResponse.json(
+        { error: "Adaugă cel puțin o poză a camerei." },
+        { status: 400 }
+      );
+    }
     if (photos.length > ROOM_KEYS.length) {
       return NextResponse.json(
         { error: `Poți încărca cel mult ${ROOM_KEYS.length} poze.` },

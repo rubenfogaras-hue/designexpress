@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getStripe } from "@/lib/stripe";
 import { CompassGlyph } from "@/components/CompassGlyph";
 import { Reveal } from "@/components/Reveal";
 
@@ -10,31 +9,12 @@ export const metadata: Metadata = {
 };
 
 /**
- * Thank-you page — Stripe's success_url after a paid Checkout.
- * We verify the session server-side (so the page can't be faked by visiting
- * the URL directly) and greet the customer by name when available.
+ * Thank-you page. Not part of the paid flow: the Stripe Payment Link is set to
+ * `hosted_confirmation`, so Stripe shows its own confirmation after payment and
+ * never redirects here. Kept as a plain, unindexed page in case we later point
+ * the link's "after payment" redirect at it.
  */
-export default async function ThankYou({
-  searchParams,
-}: {
-  searchParams: { session_id?: string };
-}) {
-  let firstName: string | null = null;
-  let paid = false;
-
-  const sessionId = searchParams.session_id;
-  if (sessionId) {
-    try {
-      const session = await getStripe().checkout.sessions.retrieve(sessionId);
-      paid = session.payment_status === "paid";
-      const full = (session.metadata?.name ?? "").trim();
-      firstName = full ? full.split(/\s+/)[0] : null;
-    } catch {
-      // Invalid / expired session id — fall back to the generic message.
-      paid = false;
-    }
-  }
-
+export default function ThankYou() {
   return (
     <main
       style={{
@@ -60,7 +40,7 @@ export default async function ThankYou({
             color: "#9a8a64",
           }}
         >
-          {paid ? "Plată confirmată" : "Comandă primită"}
+          Comandă primită
         </p>
 
         <h1
@@ -74,8 +54,7 @@ export default async function ThankYou({
             letterSpacing: "-0.018em",
           }}
         >
-          {firstName ? `Mulțumesc, ${firstName}. ` : "Gata. "}
-          Designul tău e pe{" "}
+          Gata. Designul tău e pe{" "}
           <span style={{ fontStyle: "italic", color: "#b08a4a" }}>drum</span>.
         </h1>
 

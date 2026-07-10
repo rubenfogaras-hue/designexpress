@@ -102,6 +102,11 @@ export default function OptInPage() {
       setConsentError(true);
       return;
     }
+    // Without a photo there is nothing to render — don't take the money.
+    if (filledCount === 0) {
+      setError("Adaugă cel puțin o poză a camerei.");
+      return;
+    }
 
     setSubmitting(true);
     try {
