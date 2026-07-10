@@ -22,7 +22,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Design Express · Horizont Visuals",
   description:
-    "Trimite pozele camerei tale și primești un render fotorealist în stil clasic-contemporan, în 1–2 zile lucrătoare. De la 247 lei.",
+    "Trimite pozele camerei tale și primești un render fotorealist în stil clasic-contemporan, în 1–2 zile lucrătoare. De la 197 lei.",
 };
 
 export default function RootLayout({

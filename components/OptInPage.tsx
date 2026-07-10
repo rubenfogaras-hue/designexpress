@@ -10,7 +10,7 @@ import { getSupabaseBrowser } from "@/lib/supabase/browser";
    Editorial-luxury: warm ivory canvas, deep navy, a thread of antique gold.
    Cormorant Garamond for soul, Inter for clarity. All copy in Romanian.
 
-   Flat offer: 247 lei for up to 4 room photos, one per labeled slot (living,
+   Flat offer: 197 lei for up to 4 room photos, one per labeled slot (living,
    bucătărie, baie, dormitor) so it's clear which photo is which room once
    it lands in storage. The CTA:
      1. POSTs name/email/note/photo metadata (JSON, no file bytes) to
@@ -22,7 +22,7 @@ import { getSupabaseBrowser } from "@/lib/supabase/browser";
         handles the payment page and the confirmation after.
 ──────────────────────────────────────────────────────────────────────── */
 
-const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/14A9AMb1B4Zg50zfpV3F600";
+const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/fZu28kc5F9fw9gPgtZ3F601";
 
 const ROOM_SLOTS = [
   { key: "living", label: "Living" },
@@ -72,7 +72,7 @@ export default function OptInPage() {
   const noteColor = note.length >= NOTE_WARN ? "#b0492f" : "#9a8a64";
   const ctaLabel = submitting
     ? "Se redirecționează către plată…"
-    : "Vreau interiorul nou — 247 lei";
+    : "Vreau interiorul nou — 197 lei";
 
   // ── image handling · one labeled photo per room slot ────────────────
   const setRoomImage = (room: RoomKey, file: File | null) => {
@@ -423,7 +423,7 @@ export default function OptInPage() {
               }}
             >
               Începe <span style={{ fontStyle: "italic" }}>acum</span>.{" "}
-              <span style={{ fontStyle: "italic", color: "#b08a4a" }}>247 lei</span>.
+              <span style={{ fontStyle: "italic", color: "#b08a4a" }}>197 lei</span>.
             </h2>
             <p style={{ margin: "9px 0 0", fontSize: 13.5, color: "#8a8474" }}>
               Primești designul în 1–2 zile lucrătoare.
@@ -682,7 +682,7 @@ export default function OptInPage() {
                   color: "#1a1d2c",
                 }}
               >
-                247 lei
+                197 lei
               </span>
             </div>
 

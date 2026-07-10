@@ -121,7 +121,7 @@ export default async function ThankYou({
                 fontSize: 16,
               }}
             >
-              247 lei
+              197 lei
             </span>{" "}
             se scad din proiectul complet — răspunde la email și discutăm.
           </p>
