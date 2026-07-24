@@ -53,6 +53,22 @@ No login, no dashboard. Lead capture + payment only.
 | `/` | Static | Landing page + wizard modal |
 | `/multumire` | Static | Post-payment return page; shows the branched confirmation |
 | `/api/submit-order` | Dynamic | POST: validates order, saves it, returns signed upload URLs |
+| `/api/stripe-webhook` | Dynamic | POST: Stripe pings this when a payment completes; sends the confirmation email |
+
+## Post-payment confirmation email
+
+The Payment Link doesn't call the app back on its own, so a **Stripe webhook**
+(`/api/stripe-webhook`) is the trigger. On `checkout.session.completed` with
+`payment_status = paid`, it looks the order up by `client_reference_id`
+(= orderId), then emails the customer once: payment confirmed, we'll call them
+as soon as possible on a working day (Mon–Fri) to schedule the live 20-min
+meeting, and a thank-you. Sent from `info@horizontvisual.com` via Titan SMTP.
+
+- Signature is verified with HMAC-SHA256 (`STRIPE_WEBHOOK_SECRET`) — **no Stripe
+  API key needed**.
+- `confirmation_email_sent` (migration 0003) dedupes so Stripe retries never
+  send twice.
+- Email code: `lib/email.ts` (nodemailer + Titan SMTP).
 
 **Happy path:** land on `/` → click any CTA → wizard opens →
 **Step 1** upload all 4 room photos →
