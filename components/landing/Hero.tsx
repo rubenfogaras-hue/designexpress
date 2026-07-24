@@ -74,8 +74,8 @@ export function Hero({ onStart }: { onStart: () => void }) {
               ...lead,
               maxWidth: 540,
               margin: 0,
-              fontSize: "clamp(10px,1.7vw,17px)",
-              lineHeight: 0.8,
+              fontSize: "clamp(11px,1.7vw,17px)",
+              lineHeight: 1.15,
             }}
           >
             <strong
@@ -90,9 +90,13 @@ export function Hero({ onStart }: { onStart: () => void }) {
             </strong>{" "}
             trimite-mi pozele celor patru camere — living, bucătărie, dormitor,
             baie. Ți le transform în stil{" "}
-            <em style={goldEm}>clasic-contemporan</em> și{" "}
-            <strong style={{ fontWeight: 700 }}>te ajut,</strong>{" "}
-            <em style={{ ...goldEm, fontWeight: 700 }}>live</em>
+            <em style={{ ...goldEm, fontSize: "clamp(13px,1.6vw,19px)" }}>
+              clasic-contemporan
+            </em>{" "}
+            și <strong style={{ fontWeight: 700 }}>te ajut,</strong>{" "}
+            <em style={{ ...goldEm, fontWeight: 700, fontSize: "clamp(13px,1.6vw,19px)" }}>
+              live
+            </em>
             <strong style={{ fontWeight: 700 }}>
               , să faci următorul pas, pentru interiorul dorit.
             </strong>
