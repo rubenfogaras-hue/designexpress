@@ -19,7 +19,7 @@ export function SiteFooter({ onStart }: { onStart: () => void }) {
         <div style={{ maxWidth: 620 }}>
           <p
             style={{
-              fontSize: "clamp(13px,1.6vw,17px)",
+              fontSize: "clamp(11px,1.3vw,13px)",
               letterSpacing: "var(--type-overline-tracking)",
               textTransform: "uppercase",
               color: "var(--on-dark-soft)",
@@ -33,7 +33,7 @@ export function SiteFooter({ onStart }: { onStart: () => void }) {
             style={{
               fontFamily: "var(--font-serif)",
               fontWeight: 500,
-              fontSize: "clamp(32px,6.4vw,65px)",
+              fontSize: "clamp(35px,6.8vw,70px)",
               lineHeight: 1.04,
               letterSpacing: "-0.018em",
               color: "var(--on-dark)",

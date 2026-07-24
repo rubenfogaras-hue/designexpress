@@ -41,7 +41,7 @@ export function Hero({ onStart }: { onStart: () => void }) {
             style={{
               fontFamily: "var(--font-serif)",
               fontWeight: 500,
-              fontSize: "clamp(31px,7vw,63px)",
+              fontSize: "clamp(34px,7.4vw,68px)",
               lineHeight: 1.05,
               letterSpacing: "-0.018em",
               color: "var(--ink)",
@@ -74,8 +74,6 @@ export function Hero({ onStart }: { onStart: () => void }) {
               ...lead,
               maxWidth: 540,
               margin: 0,
-              fontSize: "clamp(15.5px,2.2vw,22px)",
-              lineHeight: 1.5,
             }}
           >
             <strong

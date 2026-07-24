@@ -12,9 +12,9 @@ export const section: CSSProperties = {
   padding: "clamp(28px,4vw,48px) clamp(22px,5vw,40px)",
 };
 
-/** Gold uppercase eyebrow above a section headline. */
+/** Gold uppercase eyebrow above a section headline — the smallest text tier. */
 export const overline: CSSProperties = {
-  fontSize: "clamp(13px,1.6vw,17px)",
+  fontSize: "clamp(11px,1.3vw,13px)",
   letterSpacing: "var(--type-overline-tracking)",
   textTransform: "uppercase",
   color: "var(--gold)",
@@ -30,11 +30,11 @@ export const figLabel: CSSProperties = {
   marginBottom: 9,
 };
 
-/** Section headline — serif, tight, clamped. */
+/** Section headline — serif, tight, clamped. The dominant text tier. */
 export const displayH2: CSSProperties = {
   fontFamily: "var(--font-serif)",
   fontWeight: 500,
-  fontSize: "clamp(32px,6.4vw,65px)",
+  fontSize: "clamp(35px,6.8vw,70px)",
   lineHeight: 1.08,
   letterSpacing: "-0.015em",
   color: "var(--ink)",
@@ -42,10 +42,10 @@ export const displayH2: CSSProperties = {
   textWrap: "pretty",
 };
 
-/** Lead paragraph under a headline. */
+/** Lead paragraph (subheadline) under a headline — smaller than the headline. */
 export const lead: CSSProperties = {
-  fontSize: "clamp(17px,2.2vw,22px)",
-  lineHeight: 1.6,
+  fontSize: "clamp(14px,1.7vw,17px)",
+  lineHeight: 1.55,
   color: "var(--body-strong)",
 };
 

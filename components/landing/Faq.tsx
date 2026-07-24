@@ -42,7 +42,7 @@ export function Faq() {
         style={{
           fontFamily: "var(--font-serif)",
           fontWeight: 500,
-          fontSize: "clamp(32px,6.4vw,65px)",
+          fontSize: "clamp(35px,6.8vw,70px)",
           lineHeight: 1.1,
           letterSpacing: "-0.015em",
           color: "var(--ink)",
