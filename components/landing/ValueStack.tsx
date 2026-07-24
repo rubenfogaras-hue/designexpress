@@ -2,7 +2,7 @@
 
 import { Reveal } from "../Reveal";
 import { AssetImage } from "../AssetImage";
-import { btnCream, figLabel } from "./styles";
+import { figLabel } from "./styles";
 
 const ITEMS = [
   {
@@ -23,7 +23,36 @@ const ITEMS = [
   },
 ];
 
-/** The offer, itemised: 650 lei of value sold for 297. */
+/** Small gold check that marks each included item. */
+function Check() {
+  return (
+    <svg
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+      style={{ flexShrink: 0, marginTop: 1 }}
+    >
+      <circle cx="12" cy="12" r="11" fill="none" stroke="var(--gold)" strokeWidth="1.2" />
+      <path
+        d="M7 12.5l3 3 7-8"
+        stroke="var(--gold-300)"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/**
+ * The offer — a self-contained "value stack" card (Russell-style): each
+ * included item with a checkmark and its standalone value, then the total
+ * struck through, the today price, a savings badge, and the CTA — all inside
+ * one gold-bordered card that stands apart from the editorial sections and
+ * fits with its button on a phone.
+ */
 export function ValueStack({ onStart }: { onStart: () => void }) {
   return (
     <section style={{ background: "var(--navy)" }}>
@@ -31,7 +60,7 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
         style={{
           maxWidth: "var(--container)",
           margin: "0 auto",
-          padding: "clamp(32px,4.5vw,56px) clamp(22px,5vw,40px)",
+          padding: "clamp(30px,4.5vw,56px) clamp(18px,5vw,40px)",
         }}
       >
         <div
@@ -49,11 +78,11 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
           style={{
             fontFamily: "var(--font-serif)",
             fontWeight: 500,
-            fontSize: "clamp(35px,6.8vw,70px)",
+            fontSize: "clamp(27px,6vw,70px)",
             lineHeight: 1.1,
             letterSpacing: "-0.015em",
             color: "var(--on-dark)",
-            margin: "16px 0 0",
+            margin: "12px 0 0",
             textWrap: "pretty",
           }}
         >
@@ -66,124 +95,175 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
 
         <div
           style={{
-            marginTop: "clamp(28px,4vw,44px)",
+            marginTop: "clamp(18px,3.5vw,44px)",
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-            gap: "clamp(32px,5vw,64px)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "clamp(24px,5vw,64px)",
             alignItems: "start",
           }}
         >
-          <div>
+          {/* ── the offer card ─────────────────────────────────────────── */}
+          <div
+            style={{
+              border: "1.5px solid var(--gold)",
+              borderRadius: "var(--radius-xl)",
+              background: "var(--surface-dark-elevated)",
+              overflow: "hidden",
+              boxShadow: "0 12px 44px rgba(0,0,0,0.28)",
+            }}
+          >
             <div
               style={{
-                border: "1px solid var(--hairline-dark)",
-                borderRadius: "var(--radius-lg)",
-                overflow: "hidden",
+                padding: "11px 22px",
+                borderBottom: "1px solid var(--hairline-dark)",
+                textAlign: "center",
+                fontSize: 11,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "var(--gold-300)",
+                fontWeight: 600,
               }}
             >
-              {ITEMS.map((item, i) => (
-                <div
-                  key={item.text}
-                  style={{
-                    display: "flex",
-                    gap: 20,
-                    alignItems: "baseline",
-                    justifyContent: "space-between",
-                    padding: "22px 26px",
-                    borderTop:
-                      i === 0 ? undefined : "1px solid var(--hairline-dark)",
-                  }}
-                >
-                  <p
-                    style={{
-                      margin: 0,
-                      color: "var(--on-dark)",
-                      fontSize: 17,
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {i + 1}. {item.text}
-                  </p>
-                  <span
-                    style={{
-                      flexShrink: 0,
-                      fontFamily: "var(--font-serif)",
-                      fontStyle: "italic",
-                      color: "var(--gold-300)",
-                      fontSize: 26,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {item.price}
-                  </span>
-                </div>
-              ))}
+              Pachetul complet · o singură plată
+            </div>
 
+            {ITEMS.map((item, i) => (
               <div
+                key={item.text}
                 style={{
-                  padding: 26,
-                  borderTop: "1px solid var(--hairline-dark)",
-                  background: "var(--surface-dark-elevated)",
-                  textAlign: "right",
+                  display: "flex",
+                  gap: 12,
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  padding: "clamp(10px,2.6vw,15px) clamp(15px,4vw,24px)",
+                  borderTop: i === 0 ? undefined : "1px solid var(--hairline-dark)",
                 }}
               >
-                <div
+                <span style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+                  <Check />
+                  <span
+                    style={{
+                      color: "var(--on-dark)",
+                      fontSize: "clamp(13px,1.5vw,15.5px)",
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {item.text}
+                  </span>
+                </span>
+                <span
                   style={{
-                    fontSize: 19,
-                    color: "var(--on-dark-soft)",
-                    textDecoration: "line-through",
-                  }}
-                >
-                  Valoare totală: 650 lei
-                </div>
-                <div
-                  style={{
+                    flexShrink: 0,
                     fontFamily: "var(--font-serif)",
                     fontStyle: "italic",
                     color: "var(--gold-300)",
-                    fontSize: "clamp(38px,5vw,56px)",
-                    lineHeight: 1.1,
-                    margin: "8px 0 4px",
+                    fontSize: "clamp(17px,2.2vw,23px)",
+                    lineHeight: 1.2,
                   }}
                 >
-                  Azi: 297 lei
-                </div>
-                <div
-                  style={{
-                    fontSize: "clamp(18px,2.4vw,25px)",
-                    letterSpacing: "0.02em",
-                    color: "var(--on-dark)",
-                  }}
-                >
-                  Economisești 353 lei
-                </div>
+                  {item.price}
+                </span>
               </div>
-            </div>
+            ))}
 
-            <div style={{ marginTop: 28 }}>
-              <em
+            {/* price block */}
+            <div
+              style={{
+                padding: "clamp(14px,3.5vw,24px)",
+                borderTop: "1px solid var(--hairline-dark)",
+                background: "var(--navy-900)",
+                textAlign: "center",
+              }}
+            >
+              <div
                 style={{
-                  fontSize: "clamp(18px,2.4vw,25px)",
-                  lineHeight: 1.6,
-                  fontStyle: "normal",
+                  fontSize: "clamp(13.5px,1.6vw,17px)",
+                  color: "var(--on-dark-soft)",
+                }}
+              >
+                Valoare totală:{" "}
+                <span style={{ textDecoration: "line-through" }}>650 lei</span>
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: "var(--gold-300)",
+                  fontWeight: 600,
+                  margin: "9px 0 2px",
+                }}
+              >
+                Azi doar
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-serif)",
+                  fontStyle: "italic",
+                  color: "var(--gold-300)",
+                  fontSize: "clamp(36px,7.2vw,54px)",
+                  lineHeight: 1,
+                }}
+              >
+                297 lei
+              </div>
+              <div
+                style={{
+                  display: "inline-block",
+                  marginTop: 10,
+                  padding: "6px 16px",
+                  border: "1px solid var(--gold)",
+                  borderRadius: "var(--radius-pill)",
+                  fontSize: "clamp(13px,1.6vw,15px)",
+                  letterSpacing: "0.02em",
                   color: "var(--on-dark)",
                 }}
               >
-                Începe acum — cât timp prețul e încă 297 lei.
-              </em>
-              <div style={{ marginTop: 16 }}>
-                <button
-                  type="button"
-                  onClick={onStart}
-                  className="hv-btn-cream"
-                  style={btnCream}
-                >
-                  Vreau să-mi văd casa — 297 lei
-                </button>
+                Economisești 353 lei
               </div>
+            </div>
+
+            {/* CTA inside the card */}
+            <div
+              style={{
+                padding: "clamp(13px,3.5vw,22px)",
+                borderTop: "1px solid var(--hairline-dark)",
+              }}
+            >
+              <button
+                type="button"
+                onClick={onStart}
+                className="hv-btn-cream"
+                style={{
+                  width: "100%",
+                  fontFamily: "var(--font-sans)",
+                  fontWeight: 600,
+                  fontSize: "clamp(15px,1.8vw,17px)",
+                  lineHeight: 1.1,
+                  color: "var(--navy)",
+                  background: "var(--on-primary)",
+                  border: "none",
+                  borderRadius: "var(--radius-md)",
+                  padding: "14px 20px",
+                  cursor: "pointer",
+                }}
+              >
+                Vreau să-mi văd casa — 297 lei
+              </button>
+              <p
+                style={{
+                  margin: "10px 0 0",
+                  textAlign: "center",
+                  fontSize: "clamp(12px,1.5vw,13.5px)",
+                  color: "var(--on-dark-soft)",
+                }}
+              >
+                Începe acum — cât timp prețul e încă 297 lei.
+              </p>
             </div>
           </div>
 
+          {/* ── proof beside the offer ─────────────────────────────────── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <figure style={{ margin: 0 }}>
               <figcaption style={{ ...figLabel, color: "var(--gold-300)" }}>
