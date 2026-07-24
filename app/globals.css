@@ -206,6 +206,33 @@ body {
   color: var(--gold-300);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   Hero layout.
+   On a phone the order becomes headline → images → subheadline → buttons;
+   on desktop the text sits left and the images right. See Hero.tsx, whose
+   three blocks map to the grid areas lead / media / rest.
+   ═══════════════════════════════════════════════════════════════════════ */
+.hv-hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  grid-template-areas:
+    "lead"
+    "media"
+    "rest";
+}
+@media (min-width: 860px) {
+  .hv-hero {
+    grid-template-columns: 1.05fr 0.95fr;
+    column-gap: clamp(40px, 6vw, 80px);
+    row-gap: 24px;
+    align-items: center;
+    grid-template-areas:
+      "lead  media"
+      "rest  media";
+  }
+}
+
 /* ── Legacy classes still used by the v1 opt-in page ─────────────────── */
 .hv-dropzone {
   transition: border-color 0.35s var(--ease), background 0.35s var(--ease);

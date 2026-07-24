@@ -4,7 +4,15 @@ import { Reveal } from "../Reveal";
 import { AssetImage } from "../AssetImage";
 import { btnGhost, btnNavy, figLabel, goldEm, lead, overline } from "./styles";
 
-/** Hero — the promise, the two CTAs, and the first before/after pair. */
+/**
+ * Hero — the promise and the first before/after pair.
+ *
+ * Layout reflows via the `.hv-hero` grid (globals.css). Three blocks map to
+ * grid areas: `lead` (eyebrow + headline), `media` (the two photos) and
+ * `rest` (rule + subheadline + CTAs). On desktop the text sits left and the
+ * images right; on a phone the order becomes
+ * headline → images → subheadline → buttons.
+ */
 export function Hero({ onStart }: { onStart: () => void }) {
   const scrollToProof = () => {
     document
@@ -21,15 +29,9 @@ export function Hero({ onStart }: { onStart: () => void }) {
           "clamp(24px,3.5vw,44px) clamp(22px,5vw,40px) clamp(48px,6vw,72px)",
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "clamp(40px,6vw,80px)",
-          alignItems: "center",
-        }}
-      >
-        <Reveal style={{ flex: "1.05 1 380px" }}>
+      <div className="hv-hero">
+        {/* lead — eyebrow + headline */}
+        <Reveal style={{ gridArea: "lead" }}>
           <div style={overline}>Design Express · Vezi-ți casa transformată</div>
 
           <h1
@@ -49,14 +51,38 @@ export function Hero({ onStart }: { onStart: () => void }) {
               timp pierdut, bani irosiți, și materiale risipite?
             </i>
           </h1>
+        </Reveal>
 
+        {/* media — before + after */}
+        <Reveal style={{ gridArea: "media" }}>
+          <figure style={{ margin: "0 0 14px" }}>
+            <figcaption style={{ ...figLabel, color: "var(--muted)" }}>
+              Înainte
+            </figcaption>
+            <AssetImage
+              src="/assets/before-bedroom.jpg"
+              alt="Dormitor înainte de transformare"
+              muted
+            />
+          </figure>
+          <figure style={{ margin: 0 }}>
+            <figcaption style={{ ...figLabel, color: "var(--gold)" }}>După</figcaption>
+            <AssetImage
+              src="/assets/after-bedroom.jpg"
+              alt="Dormitor după transformare"
+            />
+          </figure>
+        </Reveal>
+
+        {/* rest — rule + subheadline + CTAs */}
+        <Reveal style={{ gridArea: "rest" }}>
           <div
             style={{
               width: 72,
               height: 1,
               background: "var(--gold)",
               opacity: 0.6,
-              margin: "30px 0 26px",
+              margin: "0 0 26px",
             }}
           />
 
@@ -102,26 +128,6 @@ export function Hero({ onStart }: { onStart: () => void }) {
               Vezi transformările
             </button>
           </div>
-        </Reveal>
-
-        <Reveal style={{ flex: "0.95 1 360px" }}>
-          <figure style={{ margin: "0 0 14px" }}>
-            <figcaption style={{ ...figLabel, color: "var(--muted)" }}>
-              Înainte
-            </figcaption>
-            <AssetImage
-              src="/assets/before-bedroom.jpg"
-              alt="Dormitor înainte de transformare"
-              muted
-            />
-          </figure>
-          <figure style={{ margin: 0 }}>
-            <figcaption style={{ ...figLabel, color: "var(--gold)" }}>După</figcaption>
-            <AssetImage
-              src="/assets/after-bedroom.jpg"
-              alt="Dormitor după transformare"
-            />
-          </figure>
         </Reveal>
       </div>
     </section>

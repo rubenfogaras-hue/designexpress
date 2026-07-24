@@ -26,7 +26,7 @@ export default function LandingPage() {
 
   return (
     <>
-      <TopBar />
+      <TopBar onStart={openWizard} />
       <Hero onStart={openWizard} />
       <BeforeAfter />
       <HowItWorks />

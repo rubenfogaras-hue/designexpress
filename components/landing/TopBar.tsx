@@ -1,21 +1,23 @@
+"use client";
+
 import { CompassGlyph } from "../CompassGlyph";
 
-/** Slim navy status bar above the hero. */
-export function TopBar() {
+/**
+ * Slim navy bar: brand on the left, a CTA that opens the wizard on the right.
+ * Kept to a single line (no wrap) on every width so it stays thin.
+ */
+export function TopBar({ onStart }: { onStart: () => void }) {
   return (
-    <div style={{ background: "var(--navy)", color: "var(--gold-300)" }}>
+    <div style={{ background: "var(--navy)" }}>
       <div
         style={{
           maxWidth: "var(--container)",
           margin: "0 auto",
-          padding: "9px clamp(22px,5vw,40px)",
+          padding: "8px clamp(22px,5vw,40px)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: 16,
-          flexWrap: "wrap",
-          fontSize: 12,
-          letterSpacing: "0.02em",
+          gap: 12,
         }}
       >
         <span
@@ -32,31 +34,27 @@ export function TopBar() {
           Horizont&nbsp;<i style={{ fontStyle: "italic" }}>Visuals</i>
         </span>
 
-        <span
+        <button
+          type="button"
+          onClick={onStart}
+          className="hv-btn-cream"
           style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 14,
-            flexWrap: "wrap",
-            color: "var(--gold-300)",
+            fontFamily: "var(--font-sans)",
+            fontWeight: 500,
+            fontSize: 12.5,
+            lineHeight: 1,
+            color: "var(--navy)",
+            background: "var(--on-primary)",
+            border: "none",
+            borderRadius: "var(--radius-md)",
+            padding: "8px 16px",
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
           }}
         >
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                background: "var(--success)",
-              }}
-            />
-            Acum primim proiecte
-          </span>
-          <span style={{ color: "var(--hairline-dark)" }}>·</span>
-          <span style={{ color: "var(--on-dark-soft)" }}>
-            Design Express — livrare în câteva zile
-          </span>
-        </span>
+          Vreau să-mi văd casa
+        </button>
       </div>
     </div>
   );
