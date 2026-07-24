@@ -215,21 +215,30 @@ body {
 .hv-hero {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 16px;
   grid-template-areas:
     "lead"
+    "sub"
     "media"
-    "rest";
+    "cta";
+}
+/* The gold divider is desktop-only — on a phone it just costs fold space. */
+.hv-hero-rule {
+  display: none;
 }
 @media (min-width: 860px) {
   .hv-hero {
     grid-template-columns: 1.05fr 0.95fr;
     column-gap: clamp(40px, 6vw, 80px);
-    row-gap: 24px;
+    row-gap: 20px;
     align-items: center;
     grid-template-areas:
       "lead  media"
-      "rest  media";
+      "sub   media"
+      "cta   media";
+  }
+  .hv-hero-rule {
+    display: block;
   }
 }
 
