@@ -74,6 +74,8 @@ export function Hero({ onStart }: { onStart: () => void }) {
               ...lead,
               maxWidth: 540,
               margin: 0,
+              fontSize: "clamp(10px,1.7vw,17px)",
+              lineHeight: 0.8,
             }}
           >
             <strong
