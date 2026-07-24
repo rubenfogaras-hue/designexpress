@@ -42,10 +42,11 @@ export const displayH2: CSSProperties = {
   textWrap: "pretty",
 };
 
-/** Lead paragraph (subheadline) under a headline — smaller than the headline. */
+/** Lead paragraph (subheadline) under a headline — smaller than the headline.
+    13px on phones, tight line spacing. */
 export const lead: CSSProperties = {
-  fontSize: "clamp(14px,1.7vw,17px)",
-  lineHeight: 1.55,
+  fontSize: "clamp(13px,1.7vw,17px)",
+  lineHeight: 1.4,
   color: "var(--body-strong)",
 };
 
