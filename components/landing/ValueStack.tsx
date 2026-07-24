@@ -57,9 +57,11 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
             textWrap: "pretty",
           }}
         >
-          Vezi interiorul înainte să spargi un perete sau să comanzi materialul{" "}
-          <i style={{ fontStyle: "italic", color: "var(--gold-300)" }}>greșit</i>
-          .
+          Vezi interiorul{" "}
+          <i style={{ fontStyle: "italic", color: "var(--gold-300)" }}>
+            înainte să spargi
+          </i>{" "}
+          un perete sau să comanzi materialul greșit.
         </h2>
 
         <div
