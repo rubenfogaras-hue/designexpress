@@ -38,3 +38,6 @@ dev-out.log
 
 .vercel
 .env*
+
+# typescript incremental build cache
+*.tsbuildinfo
