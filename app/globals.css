@@ -2,7 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Horizont Visuals base ──────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   Horizont Visuals — design tokens
+   Ported from the Claude Design project's colors_and_type.css so the page
+   can be written against the same variable names as the design file.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Brand — deep navy */
+  --navy: #1b2236;
+  --navy-700: #2a3149;
+  --navy-900: #131829;
+
+  /* Brand — brushed antique gold (accent only) */
+  --gold: #b08a4a;
+  --gold-600: #957231;
+  --gold-300: #d8be8e;
+
+  /* Ivory canvas */
+  --canvas: #f6f1e8;
+  --surface-soft: #f0eadc;
+  --surface-card: #ebe3d1;
+  --surface-cream-strong: #e4d9c0;
+
+  /* Dark surfaces */
+  --surface-dark: #1b2236;
+  --surface-dark-elevated: #2a3149;
+  --surface-dark-soft: #161c2c;
+
+  /* Hairlines */
+  --hairline: #d9cfb8;
+  --hairline-soft: #e4dcc9;
+  --hairline-dark: #2f3650;
+
+  /* Text */
+  --ink: #1a1d2c;
+  --body-strong: #2a2e40;
+  --body: #3d4255;
+  --muted: #6b6f80;
+  --muted-soft: #8d91a0;
+  --on-primary: #f6f1e8;
+  --on-dark: #f6f1e8;
+  --on-dark-soft: #9ea3b8;
+
+  /* Semantic */
+  --success: #6a8d63;
+  --warning: #b08a4a;
+  --error: #a8493d;
+
+  /* Type stacks — bridged to the next/font variables set in layout.tsx */
+  --font-serif: var(--font-cormorant), Garamond, "Times New Roman", serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+
+  /* Type scale */
+  --type-overline-size: 11px;
+  --type-overline-tracking: 0.16em;
+
+  /* Radii */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 16px;
+  --radius-pill: 9999px;
+
+  /* Elevation */
+  --shadow-hover: 0 2px 12px rgba(20, 22, 32, 0.06);
+  --shadow-card: 0 1px 2px rgba(20, 22, 32, 0.04);
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 0.36, 0, 1);
+  --dur-fast: 180ms;
+  --dur-base: 280ms;
+  --dur-slow: 600ms;
+
+  /* Layout */
+  --container: 1200px;
+  --container-narrow: 880px;
+}
+
+/* ── Base ────────────────────────────────────────────────────────────── */
 html,
 body {
   margin: 0;
@@ -10,75 +89,154 @@ body {
 }
 
 body {
-  background: #f6f1e8; /* warm ivory — never pure white */
-  color: #3d4255;
+  background: var(--canvas);
+  color: var(--body);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  line-height: 1.5;
+  line-height: 1.55;
   overflow-x: hidden;
 }
 
-::selection {
-  background: rgba(176, 138, 74, 0.22);
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-/* Reveal-on-scroll (12px rise + fade) is driven by GSAP ScrollTrigger — see
-   components/Reveal.tsx and lib/gsap.ts. Content stays visible without JS. */
+::selection {
+  background: var(--gold-300);
+  color: var(--ink);
+}
 
-/* ── Interaction states (calm, eased — no bounce) ────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   Interaction states.
+   The design expresses hovers via a `style-hover` attribute, which inline
+   styles cannot do in React — each one becomes a class here.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Primary — navy fill on ivory */
+.hv-btn-navy {
+  transition: background var(--dur-base) var(--ease),
+    box-shadow var(--dur-base) var(--ease), opacity var(--dur-base) var(--ease);
+}
+.hv-btn-navy:hover:not(:disabled) {
+  background: var(--navy-700);
+  box-shadow: var(--shadow-hover);
+}
+.hv-btn-navy:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Secondary — outlined on ivory */
+.hv-btn-ghost {
+  transition: border-color var(--dur-base) var(--ease),
+    background var(--dur-base) var(--ease);
+}
+.hv-btn-ghost:hover {
+  border-color: var(--gold);
+  background: var(--surface-card);
+}
+
+/* Primary — cream fill on navy */
+.hv-btn-cream {
+  transition: background var(--dur-base) var(--ease),
+    box-shadow var(--dur-base) var(--ease);
+}
+.hv-btn-cream:hover {
+  background: var(--gold-300);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Upload tile */
+.hv-tile {
+  transition: border-color var(--dur-base) var(--ease);
+}
+.hv-tile:hover {
+  border-color: var(--gold);
+}
+
+/* Question option */
+.hv-opt {
+  transition: border-color var(--dur-base) var(--ease),
+    background var(--dur-base) var(--ease);
+}
+.hv-opt:not(.is-selected):hover {
+  border-color: var(--gold-300);
+}
+
+/* Text inputs */
 .hv-input {
-  transition: border-color 0.35s cubic-bezier(0.22, 0.36, 0, 1),
-    box-shadow 0.35s cubic-bezier(0.22, 0.36, 0, 1);
+  transition: border-color var(--dur-base) var(--ease),
+    box-shadow var(--dur-base) var(--ease);
 }
 .hv-input:focus {
   outline: none;
-  border-color: #b08a4a;
-  box-shadow: 0 0 0 3px rgba(176, 138, 74, 0.18);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(176, 138, 74, 0.16);
 }
 
+/* Muted → ink on hover (back links, close buttons) */
+.hv-muted-hover {
+  transition: color var(--dur-base) var(--ease);
+}
+.hv-muted-hover:hover {
+  color: var(--ink);
+}
+.hv-dark-hover {
+  transition: color var(--dur-base) var(--ease);
+}
+.hv-dark-hover:hover {
+  color: var(--on-dark);
+}
+
+/* Footer / inline links */
+.hv-link {
+  transition: color var(--dur-base) var(--ease),
+    border-color var(--dur-base) var(--ease);
+}
+.hv-link:hover {
+  color: var(--gold);
+}
+.hv-link-on-dark {
+  transition: color var(--dur-base) var(--ease);
+}
+.hv-link-on-dark:hover {
+  color: var(--gold-300);
+}
+
+/* ── Legacy classes still used by the v1 opt-in page ─────────────────── */
 .hv-dropzone {
-  transition: border-color 0.35s cubic-bezier(0.22, 0.36, 0, 1),
-    background 0.35s cubic-bezier(0.22, 0.36, 0, 1);
+  transition: border-color 0.35s var(--ease), background 0.35s var(--ease);
 }
 .hv-dropzone:hover,
 .hv-dropzone.is-dragging {
-  border-color: #b08a4a;
+  border-color: var(--gold);
   background: #f7f1e4;
 }
-
 .hv-cta {
-  transition: background 0.35s cubic-bezier(0.22, 0.36, 0, 1),
-    box-shadow 0.35s cubic-bezier(0.22, 0.36, 0, 1);
+  transition: background 0.35s var(--ease), box-shadow 0.35s var(--ease);
 }
 .hv-cta:hover:not(:disabled) {
   background: #283250;
   box-shadow: 0 6px 20px rgba(20, 22, 32, 0.16);
 }
 .hv-cta:active:not(:disabled) {
-  background: #12182a;
+  background: var(--navy-900);
 }
 .hv-cta:disabled {
   cursor: default;
   opacity: 0.92;
 }
-
 .hv-remove {
-  transition: color 0.25s cubic-bezier(0.22, 0.36, 0, 1);
+  transition: color 0.25s var(--ease);
 }
 .hv-remove:hover {
   color: #b0492f;
 }
-
-.hv-link {
-  transition: color 0.25s cubic-bezier(0.22, 0.36, 0, 1);
-}
-.hv-link:hover {
-  color: #1b2236;
-}
-
 .hv-lift {
-  transition: box-shadow 0.45s cubic-bezier(0.22, 0.36, 0, 1),
-    transform 0.45s cubic-bezier(0.22, 0.36, 0, 1);
+  transition: box-shadow 0.45s var(--ease), transform 0.45s var(--ease);
 }
 .hv-lift:hover {
   box-shadow: 0 14px 40px rgba(20, 22, 32, 0.12);

@@ -1,5 +1,5 @@
-import OptInPage from "@/components/OptInPage";
+import LandingPage from "@/components/LandingPage";
 
 export default function Page() {
-  return <OptInPage />;
+  return <LandingPage />;
 }

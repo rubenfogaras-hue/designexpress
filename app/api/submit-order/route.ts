@@ -5,23 +5,40 @@ import { getSupabaseAdmin } from "@/lib/supabase/server";
 // Needs the Node runtime (crypto + the Supabase admin client).
 export const runtime = "nodejs";
 
-const ROOM_KEYS = ["living", "bucatarie", "baie", "dormitor"];
+const ROOM_KEYS = ["living", "bucatarie", "dormitor", "baie"];
+const QUESTION_KEYS = ["q1", "q2", "q3", "q4", "q5", "q6"];
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": ".jpg",
   "image/png": ".png",
 };
 const BUCKET = "design-express-photos";
+const NOTE_LIMIT = 300;
+const ANSWER_LIMIT = 200;
 
 function isEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+/** Keep only the six known question keys, as trimmed strings. */
+function cleanAnswers(raw: unknown): Record<string, string> {
+  if (!raw || typeof raw !== "object") return {};
+  const source = raw as Record<string, unknown>;
+  const out: Record<string, string> = {};
+  for (const key of QUESTION_KEYS) {
+    const value = source[key];
+    if (typeof value === "string" && value.trim()) {
+      out[key] = value.trim().slice(0, ANSWER_LIMIT);
+    }
+  }
+  return out;
+}
+
 /**
- * Registers the order (name/email/note) in Supabase and hands back a
- * short-lived signed URL per photo so the customer's browser can upload
- * the actual image bytes straight to Supabase Storage — never through
- * this route. That's deliberate: Vercel rejects any request body over
- * ~4.5MB, which real phone photos blow past easily.
+ * Registers the order (contact details, answers, note) in Supabase and hands
+ * back a short-lived signed URL per photo so the customer's browser can upload
+ * the image bytes straight to Supabase Storage — never through this route.
+ * That's deliberate: Vercel rejects any request body over ~4.5MB, which real
+ * phone photos blow past easily.
  */
 export async function POST(req: NextRequest) {
   console.log("[submit-order] request received");
@@ -29,8 +46,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const name = String(body.name ?? "").trim();
     const email = String(body.email ?? "").trim();
-    const note = String(body.note ?? "").trim().slice(0, 300);
+    const phone = String(body.phone ?? "").trim();
+    const note = String(body.note ?? "").trim().slice(0, NOTE_LIMIT);
     const consent = body.consent === true;
+    const answers = cleanAnswers(body.answers);
+    const branch = body.branch === "green" ? "green" : "red";
     const photos = Array.isArray(body.photos) ? body.photos : [];
 
     // ── validation ───────────────────────────────────────────────────
@@ -40,24 +60,26 @@ export async function POST(req: NextRequest) {
     if (!isEmail(email)) {
       return NextResponse.json({ error: "Adresa de email nu este validă." }, { status: 400 });
     }
+    if (phone.replace(/[^0-9]/g, "").length < 9) {
+      return NextResponse.json(
+        { error: "Introdu un număr de telefon valid." },
+        { status: 400 }
+      );
+    }
     if (!consent) {
       return NextResponse.json(
         { error: "Acordul de contact este necesar." },
         { status: 400 }
       );
     }
-    if (photos.length === 0) {
+    // All four rooms are required — there is nothing to render without them.
+    if (photos.length !== ROOM_KEYS.length) {
       return NextResponse.json(
-        { error: "Adaugă cel puțin o poză a camerei." },
+        { error: `Sunt necesare toate cele ${ROOM_KEYS.length} poze.` },
         { status: 400 }
       );
     }
-    if (photos.length > ROOM_KEYS.length) {
-      return NextResponse.json(
-        { error: `Poți încărca cel mult ${ROOM_KEYS.length} poze.` },
-        { status: 400 }
-      );
-    }
+
     const seenRooms = new Set<string>();
     for (const photo of photos) {
       const room = String(photo?.room ?? "");
@@ -78,7 +100,9 @@ export async function POST(req: NextRequest) {
     }
 
     const orderId = randomUUID();
-    console.log(`[submit-order] order=${orderId} photos=${photos.length}`);
+    console.log(
+      `[submit-order] order=${orderId} photos=${photos.length} branch=${branch}`
+    );
 
     const supabase = getSupabaseAdmin();
 
@@ -106,7 +130,10 @@ export async function POST(req: NextRequest) {
       order_id: orderId,
       name,
       email,
+      phone,
       note,
+      answers,
+      branch,
       photo_paths: uploads.map((u) => u.path),
     });
     if (insertError) {
