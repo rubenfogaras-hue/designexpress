@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 
 /**
  * Sends the post-payment confirmation email through the Titan mailbox
- * (info@horizontvisual.com) over SMTP. All settings come from env so no
+ * (info@rubenhorizontvisual.com) over SMTP. All settings come from env so no
  * credentials live in the code:
  *   SMTP_HOST      (default smtp.titan.email)
  *   SMTP_PORT      (default 465, SSL)
@@ -40,7 +40,7 @@ function firstName(full: string | null | undefined): string {
   return name ? name.split(/\s+/)[0] : "";
 }
 
-function buildEmail(name: string) {
+function buildEmail(name: string, fromAddress: string) {
   const hi = name ? `Bună, ${name},` : "Bună,";
 
   const text = `${hi}
@@ -53,7 +53,7 @@ Nu trebuie să faci nimic acum — doar ține telefonul aproape.
 
 Îți mulțumesc încă o dată,
 Ruben Fogaras · Horizont Visuals
-info@horizontvisual.com`;
+${fromAddress}`;
 
   const html = `<!doctype html>
 <html lang="ro">
@@ -90,7 +90,7 @@ info@horizontvisual.com`;
           <tr>
             <td style="padding:18px 32px 28px;">
               <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#8d91a0;">
-                <a href="mailto:info@horizontvisual.com" style="color:#8d91a0;">info@horizontvisual.com</a>
+                <a href="mailto:${fromAddress}" style="color:#8d91a0;">${fromAddress}</a>
               </p>
             </td>
           </tr>
@@ -110,7 +110,7 @@ export async function sendConfirmationEmail(opts: {
   name?: string | null;
 }): Promise<void> {
   const from = process.env.SMTP_USER!;
-  const { subject, text, html } = buildEmail(firstName(opts.name));
+  const { subject, text, html } = buildEmail(firstName(opts.name), from);
   await getTransporter().sendMail({
     from: `"${FROM_NAME}" <${from}>`,
     to: opts.to,

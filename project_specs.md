@@ -62,7 +62,7 @@ The Payment Link doesn't call the app back on its own, so a **Stripe webhook**
 `payment_status = paid`, it looks the order up by `client_reference_id`
 (= orderId), then emails the customer once: payment confirmed, we'll call them
 as soon as possible on a working day (Mon–Fri) to schedule the live 20-min
-meeting, and a thank-you. Sent from `info@horizontvisual.com` via Titan SMTP.
+meeting, and a thank-you. Sent from `info@rubenhorizontvisual.com` via Titan SMTP.
 
 - Signature is verified with HMAC-SHA256 (`STRIPE_WEBHOOK_SECRET`) — **no Stripe
   API key needed**.
