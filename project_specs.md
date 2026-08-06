@@ -2,15 +2,14 @@
 
 _The blueprint. Read this and `CLAUDE.MD` before changing anything._
 
-> **Status:** rewritten for the v2 design imported from Claude Design project
-> `cef3ac94-4c46-4119-9bce-30061cb7260e`, file `Design Express.dc.html`.
-> Awaiting approval before implementation.
+> **Status:** live. This file describes what is actually in the code as of
+> 2026-08-06 — not a plan. If you change the code, change this too.
 
 ## What the app does & who uses it
 
 A single-page **landing page + order funnel** for Horizont Visuals, an interior-design
 studio in Târgu Mureș. A homeowner planning a renovation uploads photos of their four
-rooms, answers six short qualifying questions, pays **197 lei**, and receives
+rooms, answers six short qualifying questions, pays **297 lei**, and receives
 photorealistic redesigns in classic-contemporary style — presented **live on a call**.
 
 - **Visitor** → reads the page, opens the wizard, uploads 4 photos, answers 6
@@ -20,40 +19,81 @@ photorealistic redesigns in classic-contemporary style — presented **live on a
 
 No login, no dashboard. Lead capture + payment only.
 
-## What changed from v1
-
-| | v1 (live today) | v2 (this design) |
-| --- | --- | --- |
-| Page | Form-only opt-in page | Full landing page; form moved into a modal wizard |
-| Photos | 1–4 optional room slots | **All 4 required** (living, bucătărie, dormitor, baie) |
-| Questions | none | **6 qualifying questions**, asked one at a time |
-| Phone | not collected | **required** (min 9 digits) |
-| Note | 300 chars, optional | 300 chars, optional ("mențiune") |
-| Confirmation | Stripe's hosted page | **Branches on the budget answer** (see below) |
-| Booking | none | "Rezervă discuția de 20 min" CTA on the green branch |
-| Price | 197 lei | 197 lei (unchanged — same Stripe Payment Link) |
-
 ## Tech stack
 
 | Layer      | Choice                                            |
 | ---------- | ------------------------------------------------- |
 | Language   | TypeScript                                        |
 | Framework  | Next.js 14 (App Router)                           |
-| Styling    | Inline styles + CSS custom properties from the design's `colors_and_type.css` |
+| Styling    | Inline styles + CSS custom properties in `app/globals.css` |
 | Payments   | Stripe **Payment Link** (hosted redirect)         |
 | Database   | Supabase Postgres (`design_express_clients`)      |
 | Storage    | Supabase Storage (`design-express-photos`, private) |
+| Email      | Titan SMTP via `nodemailer` (`lib/email.ts`)      |
 | Fonts      | `next/font` — Cormorant Garamond + Inter          |
-| Hosting    | Vercel                                            |
+| Hosting    | Vercel (project `designexpress`)                  |
+
+Tailwind is installed and its directives sit at the top of `globals.css`, but the
+page itself is written in inline styles + CSS variables. Only `font-sans` is used
+as a class. Don't add Tailwind utilities to landing components — match what's there.
 
 ## Pages & user flows (all public)
 
 | Route | Type | Purpose |
 | --- | --- | --- |
 | `/` | Static | Landing page + wizard modal |
-| `/multumire` | Static | Post-payment return page; shows the branched confirmation |
-| `/api/submit-order` | Dynamic | POST: validates order, saves it, returns signed upload URLs |
+| `/multumire` | Static | Unindexed thank-you page. **Not in the paid flow** — the Payment Link uses Stripe's hosted confirmation and never redirects here. Kept in case that changes. |
+| `/api/submit-order` | Dynamic | POST: validates the order, saves it, returns signed upload URLs |
 | `/api/stripe-webhook` | Dynamic | POST: Stripe pings this when a payment completes; sends the confirmation email |
+
+### Landing page sections
+
+Assembled in `components/LandingPage.tsx`; one file per section in
+`components/landing/`: `TopBar`, `Hero`, `BeforeAfter`, `HowItWorks`,
+`ValueStack`, `Faq`, `SiteFooter`. Every CTA on the page opens the same
+`Wizard`. Shared type/button styles live in `components/landing/styles.ts`.
+
+**Happy path:** land on `/` → click any CTA → wizard opens →
+**Step 1** upload all 4 room photos →
+**Step 2** answer 6 questions one at a time, optional 300-char note →
+**Step 3** name, email, phone, consent → click pay →
+`POST /api/submit-order` saves the order and returns one signed upload URL per photo →
+browser uploads the 4 photos straight to Supabase Storage →
+redirect to the Stripe Payment Link (`client_reference_id` = orderId) →
+customer pays → Stripe shows its own hosted confirmation → the webhook emails the
+customer.
+
+**Error paths:** any validation failure returns `400` with a Romanian message shown
+in the wizard. Upload failure blocks the redirect to Stripe (never take money for an
+order with no photos). Stripe failure leaves the order row in place, unpaid.
+
+## The offer (single source of truth: the code)
+
+**297 lei.** The number appears in `Wizard.tsx` (header, total, pay button),
+`ValueStack.tsx` (price block + CTA), `SiteFooter.tsx` (CTA), `app/layout.tsx`
+(meta description) and `app/multumire/page.tsx`. Change all of them together.
+
+The value stack (`ValueStack.tsx`) lists five **included** items:
+
+| Item | Value |
+| --- | --- |
+| Cele 4 camere · concept vizual fotorealist | 400 lei |
+| Discuție live 1-la-1 cu designerul | 500 lei |
+| Moodboard — paletar de culori și materiale | 200 lei |
+| Harta luminii — site-urile pentru iluminat | 100 lei |
+| Interior personalizat, bazat pe răspunsuri | 50 lei |
+| **Valoare totală** | **1.250 lei** |
+
+struck through, then "Azi doar 297 lei", "Economisești 953 lei".
+
+Below the price block sits one **optional add-on, sold separately** — "Lista
+achiziții — obiectele și iluminatul folosit în design", +200 lei. It is
+deliberately **excluded** from the 1.250 lei total and from the savings figure,
+because it is not part of what 297 lei buys. Keep it that way: the struck-through
+total must only ever be the sum of the included items.
+
+If you change any item price, recompute both `Valoare totală` (sum of `ITEMS`)
+and `Economisești` (that sum minus 297).
 
 ## Post-payment confirmation email
 
@@ -68,120 +108,107 @@ meeting, and a thank-you. Sent from `info@rubenhorizontvisual.com` via Titan SMT
   API key needed**.
 - `confirmation_email_sent` (migration 0003) dedupes so Stripe retries never
   send twice.
-- Email code: `lib/email.ts` (nodemailer + Titan SMTP).
+- Email copy: `lib/email.ts`.
 
-**Happy path:** land on `/` → click any CTA → wizard opens →
-**Step 1** upload all 4 room photos →
-**Step 2** answer 6 questions one at a time, optional 300-char note →
-**Step 3** name, email, phone, consent → click pay →
-`POST /api/submit-order` saves the order and returns one signed upload URL per photo →
-browser uploads the 4 photos straight to Supabase Storage →
-redirect to the Stripe Payment Link (`client_reference_id` = orderId) →
-customer pays → Stripe redirects to `/multumire` → branched confirmation.
-
-**Error paths:** any validation failure returns `400` with a Romanian message shown
-in the wizard. Upload failure blocks the redirect to Stripe (never take money for an
-order with no photos). Stripe failure leaves the order row in place, unpaid.
-
-## The confirmation branch
-
-Question 4 asks the renovation budget. The design shows two different confirmations:
-
-- **Green** — budget is `20.000–50.000 €`, `50.000–100.000 €`, or `Peste 100.000 €`.
-  Message: photos received, live 20-minute presentation, plus a **"Rezervă discuția
-  de 20 min"** button.
-- **Red** — every other answer (`Sub 20.000 €`, `Încă nu știu`).
-  Message: photos received, renders arrive by email in 1–2 working days, plus an
-  Instagram follow link.
+**The promise must stay consistent in three places** — the wizard's step 3, the
+confirmation email, and `/multumire`: *we phone you to schedule the live
+presentation*. Nothing may promise delivery by email.
 
 ## Data model
 
-Supabase table `design_express_clients`. v2 adds three columns:
+Supabase table `design_express_clients`:
 
 ```
-id           uuid pk
-order_id     uuid unique
-name         text
-email        text
-phone        text          -- NEW, required
-answers      jsonb         -- NEW, the 6 question answers
-branch       text          -- NEW, 'green' | 'red', derived from answers.q4
-note         text          -- the optional "mențiune"
-photo_paths  text[]        -- 4 paths, one per room
-created_at   timestamptz
+id                        uuid pk
+order_id                  uuid unique
+name                      text
+email                     text
+phone                     text          -- required, min 9 digits
+answers                   jsonb         -- the 6 question answers
+branch                    text          -- 'green' | 'red', derived from answers.q4
+note                      text          -- the optional "mențiune"
+photo_paths               text[]        -- 4 paths, one per room
+confirmation_email_sent   boolean       -- dedupes the webhook email
+created_at                timestamptz
 ```
 
 RLS stays on with **no policies** — only the server's `service_role` key can read or
 write. Photos stay in the private `design-express-photos` bucket, one folder per
 `order_id`, each file named after its room.
 
-**Note:** the order row is written *before* payment and there is no Stripe webhook,
-so an abandoned checkout looks identical to a paid one. Match the Stripe payment's
-`client_reference_id` to `order_id` to confirm who actually paid.
+Migrations in `supabase/migrations/`, run in order in the Supabase SQL editor:
+
+| File | What it does |
+| --- | --- |
+| `0001_design_express_clients.sql` | creates the table, turns RLS on |
+| `0002_add_phone_answers_branch.sql` | adds `phone`, `answers`, `branch` |
+| `0003_add_confirmation_email_sent.sql` | adds the email-sent flag |
+| `0004_readable_answers_view.sql` | creates the `design_express_answers` view |
+
+**Reading the orders:** open Supabase → Table Editor → Views →
+**`design_express_answers`**. One row per order, newest first, Romanian column
+names, one column per question.
+
+**Note:** the order row is written *before* payment, so an abandoned checkout looks
+like a paid one in the table. `confirmation_email_sent = true` (column
+`platit_email` in the view) is the marker that money actually arrived.
+
+## The green/red branch
+
+Question 4 asks the renovation budget.
+
+- **green** — `20.000–50.000 €`, `50.000–100.000 €`, or `Peste 100.000 €`.
+- **red** — everything else (`Sub 20.000 €`, `Încă nu știu`).
+
+It is **stored only, never shown to the customer** (decision 1 below). It exists so
+high-intent leads can be spotted in the database.
 
 ## Third-party services
 
-- **Stripe** — Payment Link `https://buy.stripe.com/fZu28kc5F9fw9gPgtZ3F601`
-  (197 RON, live). No secret key needed; the app only builds a URL.
+- **Stripe** — Payment Link `https://buy.stripe.com/6oU5kw5HhbnEakT5Pl3F602`
+  (297 RON, live), hard-coded in `components/landing/Wizard.tsx`. Set to
+  `hosted_confirmation`. No Stripe API key is used anywhere in the app.
 - **Supabase** — Postgres + Storage. Server-side `service_role` key for writes and
   signed URLs; public anon key in the browser only to PUT to a signed URL.
-
-## Assets to import
-
-Eight images from the design project into `/public/assets/`:
-
-```
-20250925_144311.jpg   20250925_165738.jpg   20250925_165807.jpg   20250925_165816.jpg
-Bathroom_renovation_...jpeg   Bedroom_interior_...jpeg
-Classic-contemporary_luxury_kitc_...jpeg   Living_room_finished_...jpeg
-```
+- **Titan** — the `info@rubenhorizontvisual.com` mailbox, over SMTP.
 
 ## Environment variables
 
-Unchanged, minus Stripe's secret key (no longer used):
+See `.env.example`. All of these are read by the code:
 
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` — server-only.
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — browser upload only.
+- `STRIPE_WEBHOOK_SECRET` — verifies the webhook signature.
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` — the confirmation email.
 
-Dead and safe to delete from Vercel: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`,
-`DESIGN_EXPRESS_PRICE_MINOR`, `DESIGN_EXPRESS_CURRENCY`, `NEXT_PUBLIC_BASE_URL`.
+They must be set both in `.env.local` (for `npm run dev`) and on Vercel
+(Settings → Environment Variables) for the live site.
 
 ## Decisions taken (2026-07-23)
 
-1. **No branched confirmation for now.** The wizard's green/red screens are not
-   implemented. On submit the customer goes straight to Stripe and sees Stripe's own
-   hosted confirmation, exactly as v1 does. The budget answer is still **stored** as
-   `branch` so Ruben can spot high-intent leads in the database — it is simply not
-   shown to the customer. Revisit once the funnel is proven.
-2. **No booking tool.** The "Rezervă discuția de 20 min" CTA is dropped along with
-   the branch screens. The promise of a call lives in Stripe's confirmation message
-   instead, which is updated to say Ruben will ring the number provided.
-3. **No refund promise.** The FAQ item "Dacă nu-mi place? Îți returnez cei 197 lei"
-   is removed. Four FAQ items ship.
+1. **No branched confirmation screen.** On submit the customer goes straight to
+   Stripe and sees Stripe's own hosted confirmation. The budget answer is still
+   stored as `branch`, it is simply not shown. Revisit once the funnel is proven.
+2. **No booking tool.** The "Rezervă discuția de 20 min" CTA from the original
+   design is dropped. The promise of a call lives in the confirmation email instead.
+3. **No refund promise.** The FAQ item "Dacă nu-mi place? Îți returnez banii" is
+   removed. Four FAQ items ship.
 
-## What "done" looks like
+## Housekeeping (2026-08-06)
 
-Verified in Chromium (Playwright), API stubbed so nothing was written to the
-live database:
+- `/multumire` copy realigned to the phone-call promise.
+- `.env.local` cleaned: five dead v1 keys removed (`STRIPE_SECRET_KEY`,
+  `STRIPE_PRICE_ID`, `DESIGN_EXPRESS_PRICE_MINOR`, `DESIGN_EXPRESS_CURRENCY`,
+  `NEXT_PUBLIC_BASE_URL`); the webhook + SMTP keys added.
+- Instagram handle in the footer is now a real link.
+- **Still to delete** (blocked on permission, do it manually): the dead v1
+  `components/OptInPage.tsx`, and the `uploads/` folder of v1 test orders.
 
-- [x] `npm run build` passes with no TypeScript errors.
-- [x] `/` renders every section of the design (top bar, hero, before/after,
-      cum funcționează, value stack, FAQ, footer).
-- [x] Wizard: all 4 photos required before Step 2; 6 questions gate Step 3; name +
-      valid email + 9-digit phone + consent gate the pay button.
-- [x] "Cum să fotografiez corect?" modal opens and closes.
-- [x] FAQ accordion renders four items; the refund item is gone.
-- [x] Reveal-on-scroll goes 0 → 1 for every section; nothing stays invisible.
-- [x] Submit sends phone, answers and branch; branch is `green` for
-      "Peste 100.000 €" and `red` for "Sub 20.000 €".
-- [x] Redirect to Stripe carries `client_reference_id` and `prefilled_email`.
-- [x] API rejects: no name, bad email, short/missing phone, no consent, fewer
-      than 4 photos, duplicate room, non-image file.
-- [x] Mobile: 0px horizontal overflow at 360px wide.
+## What "done" looks like for any change
 
-Still open (needs Ruben):
-
-- [ ] Run `supabase/migrations/0002_add_phone_answers_branch.sql` — until then
-      every submit fails on insert, because `phone`/`answers`/`branch` don't exist.
-- [ ] Export the six missing photos from the design project into `/public/assets`.
-- [ ] One real end-to-end purchase against the live database and Stripe.
+- `npm run build` passes with no TypeScript errors.
+- `npm run dev` → the page renders every section, no console errors.
+- The wizard still gates: 4 photos → 6 answers → name + valid email + 9-digit
+  phone + consent.
+- Price is identical in every place listed under "The offer".
+- The phone-call promise is identical in the wizard, the email and `/multumire`.

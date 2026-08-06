@@ -4,6 +4,8 @@ import { Reveal } from "../Reveal";
 import { AssetImage } from "../AssetImage";
 import { figLabel } from "./styles";
 
+/* What's included in the 297 lei. The struck-through "valoare totală" below is
+   the sum of these prices — 1.250 lei — so keep the two in step when editing. */
 const ITEMS = [
   {
     text: "Cele 4 camere transformate în stilul tău — concept vizual fotorealist",
@@ -11,10 +13,14 @@ const ITEMS = [
   },
   {
     text: "Discuție live 1-la-1 cu designerul, unde îți explic fiecare alegere",
-    price: "100 lei",
+    price: "500 lei",
   },
   {
-    text: "Direcția clară + recomandări de materiale și culori (paletă, atmosferă)",
+    text: "Moodboard — paletar de culori și materiale folosite în design",
+    price: "200 lei",
+  },
+  {
+    text: "Harta luminii — lista cu website-urile folosite de designer pentru a cumpăra iluminat",
     price: "100 lei",
   },
   {
@@ -22,6 +28,43 @@ const ITEMS = [
     price: "50 lei",
   },
 ];
+
+/* Sold separately, on top of the 297 lei — deliberately excluded from the
+   total above so the savings figure only ever counts what's actually included. */
+const OPTIONAL = {
+  text: "Lista achiziții — obiectele și iluminatul folosit în design",
+  price: "200 lei",
+};
+
+/** Hollow plus — marks the add-on, so it never reads as one of the included items. */
+function Plus() {
+  return (
+    <svg
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+      style={{ flexShrink: 0, marginTop: 1 }}
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="11"
+        fill="none"
+        stroke="var(--on-dark-soft)"
+        strokeWidth="1.2"
+        opacity="0.7"
+      />
+      <path
+        d="M12 7.5v9M7.5 12h9"
+        stroke="var(--on-dark-soft)"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 /** Small gold check that marks each included item. */
 function Check() {
@@ -182,7 +225,7 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                 }}
               >
                 Valoare totală:{" "}
-                <span style={{ textDecoration: "line-through" }}>650 lei</span>
+                <span style={{ textDecoration: "line-through" }}>1.250 lei</span>
               </div>
               <div
                 style={{
@@ -219,7 +262,61 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                   color: "var(--on-dark)",
                 }}
               >
-                Economisești 353 lei
+                Economisești 953 lei
+              </div>
+            </div>
+
+            {/* ── optional add-on, priced separately ──────────────────── */}
+            <div
+              style={{
+                padding: "clamp(12px,3vw,18px) clamp(15px,4vw,24px)",
+                borderTop: "1px solid var(--hairline-dark)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 10.5,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: "var(--on-dark-soft)",
+                  fontWeight: 600,
+                  marginBottom: 9,
+                }}
+              >
+                Opțional · se adaugă separat
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 12,
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+                  <Plus />
+                  <span
+                    style={{
+                      color: "var(--on-dark-soft)",
+                      fontSize: "clamp(13px,1.5vw,15.5px)",
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {OPTIONAL.text}
+                  </span>
+                </span>
+                <span
+                  style={{
+                    flexShrink: 0,
+                    fontFamily: "var(--font-serif)",
+                    fontStyle: "italic",
+                    color: "var(--on-dark-soft)",
+                    fontSize: "clamp(17px,2.2vw,23px)",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  +{OPTIONAL.price}
+                </span>
               </div>
             </div>
 
