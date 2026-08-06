@@ -3,7 +3,7 @@
 import { CompassGlyph } from "../CompassGlyph";
 import { btnCream } from "./styles";
 
-const META = ["@ruben.fogaras", "Târgu Mureș"];
+const INSTAGRAM_HANDLE = "ruben.fogaras";
 
 /** Closing CTA + contact strip. */
 export function SiteFooter({ onStart }: { onStart: () => void }) {
@@ -86,12 +86,19 @@ export function SiteFooter({ onStart }: { onStart: () => void }) {
             Horizont&nbsp;<i style={{ fontStyle: "italic" }}>Visuals</i>
           </span>
 
-          {META.map((item) => (
-            <span key={item} style={{ display: "contents" }}>
-              <span style={{ color: "var(--hairline-dark)" }}>·</span>
-              <span>{item}</span>
-            </span>
-          ))}
+          <span style={{ color: "var(--hairline-dark)" }}>·</span>
+          <a
+            href={`https://www.instagram.com/${INSTAGRAM_HANDLE}/`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hv-link-on-dark"
+            style={{ color: "var(--on-dark-soft)" }}
+          >
+            @{INSTAGRAM_HANDLE}
+          </a>
+
+          <span style={{ color: "var(--hairline-dark)" }}>·</span>
+          <span>Târgu Mureș</span>
 
           <span style={{ color: "var(--hairline-dark)" }}>·</span>
           <a

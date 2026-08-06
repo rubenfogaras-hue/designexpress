@@ -4,7 +4,7 @@ import { CompassGlyph } from "@/components/CompassGlyph";
 import { Reveal } from "@/components/Reveal";
 
 export const metadata: Metadata = {
-  title: "Gata. Designul tău e pe drum. · Horizont Visuals",
+  title: "Comandă primită · Horizont Visuals",
   robots: { index: false },
 };
 
@@ -13,6 +13,10 @@ export const metadata: Metadata = {
  * `hosted_confirmation`, so Stripe shows its own confirmation after payment and
  * never redirects here. Kept as a plain, unindexed page in case we later point
  * the link's "after payment" redirect at it.
+ *
+ * Its promise must stay identical to the confirmation email (lib/email.ts) and
+ * to step 3 of the wizard: we phone the customer to schedule the live
+ * presentation. Nothing here may promise delivery by email.
  */
 export default function ThankYou() {
   return (
@@ -54,8 +58,9 @@ export default function ThankYou() {
             letterSpacing: "-0.018em",
           }}
         >
-          Gata. Designul tău e pe{" "}
-          <span style={{ fontStyle: "italic", color: "#b08a4a" }}>drum</span>.
+          Gata. Urmează{" "}
+          <span style={{ fontStyle: "italic", color: "#b08a4a" }}>discuția</span>{" "}
+          ta.
         </h1>
 
         <div
@@ -76,8 +81,10 @@ export default function ThankYou() {
             color: "#3d4255",
           }}
         >
-          Am primit comanda și pozele tale. Vei primi renderul fotorealist + nota
-          de designer în 1–2 zile lucrătoare, pe email.
+          Am primit comanda și pozele tale. Îți pregătesc cele patru camere în
+          stil clasic-contemporan și te sun cât mai curând posibil, într-o zi
+          lucrătoare (luni–vineri), ca să stabilim împreună ziua și ora
+          discuției live de 20 de minute.
         </p>
 
         <div
@@ -91,7 +98,8 @@ export default function ThankYou() {
           }}
         >
           <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.55, color: "#3d4255" }}>
-            Ți-a plăcut? Cei{" "}
+            Nu trebuie să faci nimic acum — doar ține telefonul aproape. Dacă
+            mergem mai departe, cei{" "}
             <span
               style={{
                 fontFamily: "var(--font-cormorant)",
@@ -102,7 +110,7 @@ export default function ThankYou() {
             >
               297 lei
             </span>{" "}
-            se scad din proiectul complet — răspunde la email și discutăm.
+            se scad din proiectul complet — vorbim despre asta în discuția live.
           </p>
         </div>
 
