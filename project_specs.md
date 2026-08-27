@@ -53,8 +53,13 @@ Assembled in `components/LandingPage.tsx`; one file per section in
 `ValueStack`, `Faq`, `SiteFooter`. Every CTA on the page opens the same
 `Wizard`. Shared type/button styles live in `components/landing/styles.ts`.
 
+All four before/after photos are `BeforeAfterSlider` — one frame with a
+draggable divider, built on a transparent `<input type="range">` so mouse,
+touch, tap-to-jump and arrow keys all work. Roughly 95% of traffic is mobile,
+and the slider halves the height each pair used to take.
+
 **Happy path:** land on `/` → click any CTA → wizard opens →
-**Step 1** upload all 4 room photos →
+**Step 1** upload all 4 room photos (generic slots — see below) →
 **Step 2** answer 6 questions one at a time, optional 300-char note →
 **Step 3** name, email, phone, consent → click pay →
 `POST /api/submit-order` saves the order and returns one signed upload URL per photo →
@@ -67,6 +72,22 @@ customer.
 in the wizard. Upload failure blocks the redirect to Stripe (never take money for an
 order with no photos). Stripe failure leaves the order row in place, unpaid.
 
+## The four room slots
+
+The wizard's slots are **generic**: `camera1`…`camera4`, labelled "Camera 1"…
+"Camera 4". They used to be Living / Bucătărie / Dormitor / Baie, which lost
+customers whose rooms were a dining room, an office or a second bedroom.
+
+The customer picks any four rooms. The keys are the filenames in Storage
+(`<orderId>/camera1.jpg`) and are validated by `ROOM_KEYS` in
+`app/api/submit-order/route.ts` — **wizard and API must always agree.**
+
+Orders placed before 2026-08-27 have the old `living/bucatarie/dormitor/baie`
+paths; nothing migrates them, and nothing needs to.
+
+The before/after photos on the page still carry real room names (Dormitor,
+Living, Bucătărie, Baie) — those are Ruben's own finished projects, not slots.
+
 ## The offer (single source of truth: the code)
 
 **297 lei.** The number appears in `Wizard.tsx` (header, total, pay button),
@@ -75,22 +96,29 @@ order with no photos). Stripe failure leaves the order row in place, unpaid.
 
 The value stack (`ValueStack.tsx`) lists five **included** items:
 
-| Item | Value |
-| --- | --- |
-| Cele 4 camere · concept vizual fotorealist | 400 lei |
-| Discuție live 1-la-1 cu designerul | 500 lei |
-| Moodboard — paletar de culori și materiale | 200 lei |
-| Harta luminii — site-urile pentru iluminat | 100 lei |
-| Interior personalizat, bazat pe răspunsuri | 50 lei |
-| **Valoare totală** | **1.250 lei** |
+| # | Item | Value |
+| --- | --- | --- |
+| 1 | Cele 4 camere transformate | 400 lei |
+| 2 | Discuție live 1-la-1 cu designerul *(highlighted row)* | 500 lei |
+| 3 | Moodboard | 200 lei |
+| 4 | Harta luminii | 100 lei |
+| 5 | Interior personalizat | 50 lei |
+| | **Dacă le-ai cumpăra separat** | **1.250 lei** |
 
-struck through, then "Azi doar 297 lei", "Economisești 953 lei".
+Each item has a numbered navy badge, a bold title, a muted one-line description
+and its standalone value struck through. Below the list: "Dacă le-ai cumpăra
+separat 1.250 lei" struck, then a navy block — "Prețul tău azi", **297 lei**,
+"O singură plată · economisești 953 lei" — and the gold CTA.
 
-Below the price block sits one **optional add-on, sold separately** — "Lista
-achiziții — obiectele și iluminatul folosit în design", +200 lei. It is
-deliberately **excluded** from the 1.250 lei total and from the savings figure,
-because it is not part of what 297 lei buys. Keep it that way: the struck-through
-total must only ever be the sum of the included items.
+The card itself is ivory (`--canvas`) on the navy section, so it reads as a
+printed page laid on the dark band.
+
+Below the navy block sits one **optional add-on, sold separately** — "Lista
+achiziții", +200 lei, on a tinted strip headed "Opțional · nu e inclus în preț",
+with a gold `+` badge and its price **not** struck through. It is deliberately
+**excluded** from the 1.250 lei total and from the savings figure, because it is
+not part of what 297 lei buys. Keep it that way: the struck-through total must
+only ever be the sum of the included items.
 
 If you change any item price, recompute both `Valoare totală` (sum of `ITEMS`)
 and `Economisești` (that sum minus 297).

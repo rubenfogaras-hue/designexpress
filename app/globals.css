@@ -149,6 +149,16 @@ body {
   box-shadow: var(--shadow-hover);
 }
 
+/* Primary — gold fill, used on the offer card's navy price block */
+.hv-btn-gold {
+  transition: background var(--dur-base) var(--ease),
+    box-shadow var(--dur-base) var(--ease);
+}
+.hv-btn-gold:hover {
+  background: var(--gold-300);
+  box-shadow: var(--shadow-hover);
+}
+
 /* Upload tile */
 .hv-tile {
   transition: border-color var(--dur-base) var(--ease);

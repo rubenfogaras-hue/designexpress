@@ -1,100 +1,154 @@
 "use client";
 
 import { Reveal } from "../Reveal";
-import { AssetImage } from "../AssetImage";
-import { figLabel } from "./styles";
+import { BeforeAfterSlider } from "./BeforeAfterSlider";
 
-/* What's included in the 297 lei. The struck-through "valoare totală" below is
-   the sum of these prices — 1.250 lei — so keep the two in step when editing. */
+/* What's included in the 297 lei. "Dacă le-ai cumpăra separat" below is the sum
+   of these prices — 1.250 lei — so keep the two in step when editing. */
 const ITEMS = [
   {
-    text: "Cele 4 camere transformate în stilul tău — concept vizual fotorealist",
+    title: "Cele 4 camere transformate",
+    desc: "Concept vizual fotorealist, în stilul tău — camerele tale, nu o poză de pe Pinterest.",
     price: "400 lei",
   },
   {
-    text: "Discuție live 1-la-1 cu designerul, unde îți explic fiecare alegere",
+    title: "Discuție live 1-la-1 cu designerul",
+    desc: "Îți explic fiecare alegere, în direct, și răspund la orice întrebare.",
     price: "500 lei",
+    highlight: true,
   },
   {
-    text: "Moodboard — paletar de culori și materiale folosite în design",
+    title: "Moodboard",
+    desc: "Paletarul de culori și materialele folosite în design.",
     price: "200 lei",
   },
   {
-    text: "Harta luminii — lista cu website-urile folosite de designer pentru a cumpăra iluminat",
+    title: "Harta luminii",
+    desc: "Website-urile de unde cumpăr eu iluminatul pentru proiecte.",
     price: "100 lei",
   },
   {
-    text: "Interior personalizat pentru tine — bazat pe răspunsurile date",
+    title: "Interior personalizat",
+    desc: "Bazat pe răspunsurile tale, nu pe un șablon.",
     price: "50 lei",
   },
 ];
 
-/* Sold separately, on top of the 297 lei — deliberately excluded from the
-   total above so the savings figure only ever counts what's actually included. */
+/* Sold separately, on top of the 297 lei — deliberately excluded from the total
+   so the price only ever counts what is actually included. */
 const OPTIONAL = {
-  text: "Lista achiziții — obiectele și iluminatul folosit în design",
+  title: "Lista achiziții",
+  desc: "Obiectele și iluminatul folosit în design, cu link de unde le iei.",
   price: "200 lei",
 };
 
-/** Hollow plus — marks the add-on, so it never reads as one of the included items. */
-function Plus() {
+const TOTAL = "1.250 lei";
+const TODAY = "297";
+const SAVING = "953 lei";
+
+/** Numbered badge — navy for what's included, gold for the add-on. */
+function Badge({ n, tone }: { n: number | string; tone: "navy" | "gold" }) {
   return (
-    <svg
-      width="19"
-      height="19"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-      style={{ flexShrink: 0, marginTop: 1 }}
+    <span
+      style={{
+        flexShrink: 0,
+        width: 27,
+        height: 27,
+        borderRadius: "50%",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 12.5,
+        fontWeight: 600,
+        marginTop: 1,
+        background: tone === "navy" ? "var(--navy)" : "var(--gold)",
+        color: tone === "navy" ? "var(--on-dark)" : "var(--navy)",
+      }}
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="11"
-        fill="none"
-        stroke="var(--on-dark-soft)"
-        strokeWidth="1.2"
-        opacity="0.7"
-      />
-      <path
-        d="M12 7.5v9M7.5 12h9"
-        stroke="var(--on-dark-soft)"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </svg>
+      {n}
+    </span>
   );
 }
 
-/** Small gold check that marks each included item. */
-function Check() {
+/** One line of the stack: badge, title + description, and its standalone value. */
+function Row({
+  n,
+  tone,
+  title,
+  desc,
+  price,
+  strike,
+  highlight,
+  first,
+}: {
+  n: number | string;
+  tone: "navy" | "gold";
+  title: string;
+  desc: string;
+  price: string;
+  strike: boolean;
+  highlight?: boolean;
+  first?: boolean;
+}) {
   return (
-    <svg
-      width="19"
-      height="19"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-      style={{ flexShrink: 0, marginTop: 1 }}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: "clamp(10px,2.5vw,14px)",
+        padding: "clamp(12px,2.6vw,15px) clamp(12px,3vw,18px)",
+        borderTop: first ? undefined : "1px solid var(--hairline-soft)",
+        background: highlight ? "var(--surface-cream-strong)" : undefined,
+      }}
     >
-      <circle cx="12" cy="12" r="11" fill="none" stroke="var(--gold)" strokeWidth="1.2" />
-      <path
-        d="M7 12.5l3 3 7-8"
-        stroke="var(--gold-300)"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+      <Badge n={n} tone={tone} />
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontWeight: 600,
+            fontSize: "clamp(14px,1.7vw,16.5px)",
+            lineHeight: 1.3,
+            color: "var(--ink)",
+            letterSpacing: "-0.005em",
+          }}
+        >
+          {title}
+        </div>
+        <div
+          style={{
+            marginTop: 3,
+            fontSize: "clamp(12.5px,1.45vw,14px)",
+            lineHeight: 1.45,
+            color: "var(--muted)",
+          }}
+        >
+          {desc}
+        </div>
+      </div>
+
+      <span
+        style={{
+          flexShrink: 0,
+          alignSelf: "center",
+          fontSize: "clamp(12.5px,1.4vw,14px)",
+          color: "var(--muted-soft)",
+          textDecoration: strike ? "line-through" : "none",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {price}
+      </span>
+    </div>
   );
 }
 
 /**
- * The offer — a self-contained "value stack" card (Russell-style): each
- * included item with a checkmark and its standalone value, then the total
- * struck through, the today price, a savings badge, and the CTA — all inside
- * one gold-bordered card that stands apart from the editorial sections and
- * fits with its button on a phone.
+ * The offer — a numbered value stack on ivory: every included item with its
+ * standalone value struck through, what the lot would cost separately, then a
+ * navy block with today's price and the CTA. The one add-on that is *not* part
+ * of the 297 lei sits below that block, clearly fenced off, and is excluded
+ * from both the total and the savings figure.
  */
 export function ValueStack({ onStart }: { onStart: () => void }) {
   return (
@@ -140,7 +194,7 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
           style={{
             marginTop: "clamp(18px,3.5vw,44px)",
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
             gap: "clamp(24px,5vw,64px)",
             alignItems: "start",
           }}
@@ -148,129 +202,200 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
           {/* ── the offer card ─────────────────────────────────────────── */}
           <div
             style={{
-              border: "1.5px solid var(--gold)",
+              background: "var(--canvas)",
+              border: "1px solid var(--hairline)",
               borderRadius: "var(--radius-xl)",
-              background: "var(--surface-dark-elevated)",
               overflow: "hidden",
               boxShadow: "0 12px 44px rgba(0,0,0,0.28)",
             }}
           >
+            {/* header */}
             <div
-              style={{
-                padding: "11px 22px",
-                borderBottom: "1px solid var(--hairline-dark)",
-                textAlign: "center",
-                fontSize: 11,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: "var(--gold-300)",
-                fontWeight: 600,
-              }}
+              style={{ padding: "clamp(22px,4vw,32px) clamp(12px,3vw,18px) 0" }}
             >
-              Pachetul complet · o singură plată
-            </div>
-
-            {ITEMS.map((item, i) => (
-              <div
-                key={item.text}
-                style={{
-                  display: "flex",
-                  gap: 12,
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  padding: "clamp(10px,2.6vw,15px) clamp(15px,4vw,24px)",
-                  borderTop: i === 0 ? undefined : "1px solid var(--hairline-dark)",
-                }}
-              >
-                <span style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-                  <Check />
-                  <span
-                    style={{
-                      color: "var(--on-dark)",
-                      fontSize: "clamp(13px,1.5vw,15.5px)",
-                      lineHeight: 1.35,
-                    }}
-                  >
-                    {item.text}
-                  </span>
-                </span>
-                <span
-                  style={{
-                    flexShrink: 0,
-                    fontFamily: "var(--font-serif)",
-                    fontStyle: "italic",
-                    color: "var(--gold-300)",
-                    fontSize: "clamp(17px,2.2vw,23px)",
-                    lineHeight: 1.2,
-                  }}
-                >
-                  {item.price}
-                </span>
-              </div>
-            ))}
-
-            {/* price block */}
-            <div
-              style={{
-                padding: "clamp(14px,3.5vw,24px)",
-                borderTop: "1px solid var(--hairline-dark)",
-                background: "var(--navy-900)",
-                textAlign: "center",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "clamp(13.5px,1.6vw,17px)",
-                  color: "var(--on-dark-soft)",
-                }}
-              >
-                Valoare totală:{" "}
-                <span style={{ textDecoration: "line-through" }}>1.250 lei</span>
-              </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  color: "var(--gold-300)",
-                  fontWeight: 600,
-                  margin: "9px 0 2px",
-                }}
-              >
-                Azi doar
-              </div>
               <div
                 style={{
                   fontFamily: "var(--font-serif)",
-                  fontStyle: "italic",
-                  color: "var(--gold-300)",
-                  fontSize: "clamp(36px,7.2vw,54px)",
-                  lineHeight: 1,
+                  fontWeight: 500,
+                  fontSize: "clamp(32px,6.5vw,46px)",
+                  lineHeight: 1.05,
+                  textAlign: "center",
+                  color: "var(--gold)",
+                  letterSpacing: "-0.015em",
                 }}
               >
-                297 lei
+                Design Express
               </div>
+              <p
+                style={{
+                  margin: "clamp(10px,2vw,16px) 0 0",
+                  fontFamily: "var(--font-serif)",
+                  fontSize: "clamp(16px,2.2vw,21px)",
+                  lineHeight: 1.25,
+                  color: "var(--ink)",
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                Tot ce îți trebuie pentru o{" "}
+                <span style={{ textTransform: "uppercase" }}>
+                  renovare fără regrete
+                </span>
+              </p>
               <div
                 style={{
-                  display: "inline-block",
-                  marginTop: 10,
-                  padding: "6px 16px",
-                  border: "1px solid var(--gold)",
-                  borderRadius: "var(--radius-pill)",
-                  fontSize: "clamp(13px,1.6vw,15px)",
-                  letterSpacing: "0.02em",
-                  color: "var(--on-dark)",
+                  width: 68,
+                  height: 2,
+                  background: "var(--gold)",
+                  opacity: 0.75,
+                  margin: "clamp(12px,2.2vw,18px) 0 clamp(4px,1vw,8px)",
+                }}
+              />
+            </div>
+
+            {/* included */}
+            {ITEMS.map((item, i) => (
+              <Row
+                key={item.title}
+                n={i + 1}
+                tone="navy"
+                title={item.title}
+                desc={item.desc}
+                price={item.price}
+                strike
+                highlight={item.highlight}
+                first={i === 0}
+              />
+            ))}
+
+            {/* what the lot would cost separately */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "baseline",
+                justifyContent: "space-between",
+                gap: 12,
+                padding: "clamp(14px,3vw,20px) clamp(12px,3vw,18px)",
+                borderTop: "1px solid var(--hairline)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "clamp(13.5px,1.6vw,16px)",
+                  color: "var(--body)",
                 }}
               >
-                Economisești 953 lei
+                Dacă le-ai cumpăra separat
+              </span>
+              <span
+                style={{
+                  flexShrink: 0,
+                  fontSize: "clamp(14px,1.7vw,17px)",
+                  color: "var(--muted-soft)",
+                  textDecoration: "line-through",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {TOTAL}
+              </span>
+            </div>
+
+            {/* today's price + CTA */}
+            <div
+              style={{
+                padding: "0 clamp(12px,3vw,18px) clamp(12px,3vw,18px)",
+              }}
+            >
+              <div
+                style={{
+                  background: "var(--navy)",
+                  borderRadius: "var(--radius-lg)",
+                  padding: "clamp(18px,3.5vw,26px) clamp(14px,3vw,22px)",
+                  textAlign: "center",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    color: "var(--gold-300)",
+                    fontWeight: 600,
+                  }}
+                >
+                  Prețul tău azi
+                </div>
+
+                <div
+                  style={{
+                    margin: "clamp(8px,1.6vw,12px) 0 0",
+                    display: "flex",
+                    alignItems: "baseline",
+                    justifyContent: "center",
+                    gap: 8,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "var(--font-serif)",
+                      fontSize: "clamp(44px,9vw,64px)",
+                      lineHeight: 1,
+                      color: "var(--on-dark)",
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    {TODAY}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "clamp(15px,2vw,19px)",
+                      color: "var(--on-dark-soft)",
+                    }}
+                  >
+                    lei
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    marginTop: 6,
+                    fontSize: "clamp(12.5px,1.5vw,14px)",
+                    color: "var(--on-dark-soft)",
+                  }}
+                >
+                  O singură plată · economisești {SAVING}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={onStart}
+                  className="hv-btn-gold"
+                  style={{
+                    width: "100%",
+                    marginTop: "clamp(14px,2.6vw,20px)",
+                    fontFamily: "var(--font-sans)",
+                    fontWeight: 600,
+                    fontSize: "clamp(15px,1.8vw,17px)",
+                    lineHeight: 1.1,
+                    color: "var(--navy)",
+                    background: "var(--gold)",
+                    border: "none",
+                    borderRadius: "var(--radius-md)",
+                    padding: "15px 20px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Vreau să-mi văd casa →
+                </button>
               </div>
             </div>
 
-            {/* ── optional add-on, priced separately ──────────────────── */}
+            {/* the one thing that is not included */}
             <div
               style={{
-                padding: "clamp(12px,3vw,18px) clamp(15px,4vw,24px)",
-                borderTop: "1px solid var(--hairline-dark)",
+                padding:
+                  "clamp(12px,2.6vw,16px) clamp(12px,3vw,18px) clamp(16px,3vw,20px)",
+                borderTop: "1px solid var(--hairline-soft)",
+                background: "var(--surface-soft)",
               }}
             >
               <div
@@ -278,107 +403,34 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                   fontSize: 10.5,
                   letterSpacing: "0.16em",
                   textTransform: "uppercase",
-                  color: "var(--on-dark-soft)",
+                  color: "var(--muted)",
                   fontWeight: 600,
-                  marginBottom: 9,
+                  marginBottom: 4,
                 }}
               >
-                Opțional · se adaugă separat
+                Opțional · nu e inclus în preț
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  gap: 12,
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                }}
-              >
-                <span style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-                  <Plus />
-                  <span
-                    style={{
-                      color: "var(--on-dark-soft)",
-                      fontSize: "clamp(13px,1.5vw,15.5px)",
-                      lineHeight: 1.35,
-                    }}
-                  >
-                    {OPTIONAL.text}
-                  </span>
-                </span>
-                <span
-                  style={{
-                    flexShrink: 0,
-                    fontFamily: "var(--font-serif)",
-                    fontStyle: "italic",
-                    color: "var(--on-dark-soft)",
-                    fontSize: "clamp(17px,2.2vw,23px)",
-                    lineHeight: 1.2,
-                  }}
-                >
-                  +{OPTIONAL.price}
-                </span>
-              </div>
-            </div>
-
-            {/* CTA inside the card */}
-            <div
-              style={{
-                padding: "clamp(13px,3.5vw,22px)",
-                borderTop: "1px solid var(--hairline-dark)",
-              }}
-            >
-              <button
-                type="button"
-                onClick={onStart}
-                className="hv-btn-cream"
-                style={{
-                  width: "100%",
-                  fontFamily: "var(--font-sans)",
-                  fontWeight: 600,
-                  fontSize: "clamp(15px,1.8vw,17px)",
-                  lineHeight: 1.1,
-                  color: "var(--navy)",
-                  background: "var(--on-primary)",
-                  border: "none",
-                  borderRadius: "var(--radius-md)",
-                  padding: "14px 20px",
-                  cursor: "pointer",
-                }}
-              >
-                Vreau să-mi văd casa — 297 lei
-              </button>
-              <p
-                style={{
-                  margin: "10px 0 0",
-                  textAlign: "center",
-                  fontSize: "clamp(12px,1.5vw,13.5px)",
-                  color: "var(--on-dark-soft)",
-                }}
-              >
-                Începe acum — cât timp prețul e încă 297 lei.
-              </p>
+              <Row
+                n="+"
+                tone="gold"
+                title={OPTIONAL.title}
+                desc={OPTIONAL.desc}
+                price={`+${OPTIONAL.price}`}
+                strike={false}
+                first
+              />
             </div>
           </div>
 
           {/* ── proof beside the offer ─────────────────────────────────── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <figure style={{ margin: 0 }}>
-              <figcaption style={{ ...figLabel, color: "var(--gold-300)" }}>
-                Înainte
-              </figcaption>
-              <AssetImage
-                src="/assets/before-bathroom.jpg"
-                alt="Baie înainte"
-                muted
-              />
-            </figure>
-            <figure style={{ margin: 0 }}>
-              <figcaption style={{ ...figLabel, color: "var(--gold-300)" }}>
-                După
-              </figcaption>
-              <AssetImage src="/assets/after-bathroom.jpg" alt="Baie după" />
-            </figure>
-          </div>
+          <BeforeAfterSlider
+            before="/assets/before-bathroom.jpg"
+            after="/assets/after-bathroom.jpg"
+            caption="Baie"
+            beforeAlt="Baie înainte de transformare"
+            afterAlt="Baie după transformare"
+            onDark
+          />
         </div>
       </Reveal>
     </section>
