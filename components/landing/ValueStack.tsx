@@ -44,7 +44,6 @@ const OPTIONAL = {
 
 const TOTAL = "1.250 lei";
 const TODAY = "297";
-const SAVING = "953 lei";
 
 /** Numbered badge — navy for what's included, gold for the add-on. */
 function Badge({ n, tone }: { n: number | string; tone: "navy" | "gold" }) {
@@ -95,8 +94,8 @@ function Row({
       style={{
         display: "flex",
         alignItems: "flex-start",
-        gap: "clamp(10px,2.5vw,14px)",
-        padding: "clamp(12px,2.6vw,15px) clamp(12px,3vw,18px)",
+        gap: "clamp(10px,2.5vw,13px)",
+        padding: "clamp(8px,1.9vw,11px) clamp(12px,3vw,18px)",
         borderTop: first ? undefined : "1px solid var(--hairline-soft)",
         background: highlight ? "var(--surface-cream-strong)" : undefined,
       }}
@@ -117,9 +116,9 @@ function Row({
         </div>
         <div
           style={{
-            marginTop: 3,
+            marginTop: 2,
             fontSize: "clamp(12.5px,1.45vw,14px)",
-            lineHeight: 1.45,
+            lineHeight: 1.38,
             color: "var(--muted)",
           }}
         >
@@ -211,7 +210,7 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
           >
             {/* header */}
             <div
-              style={{ padding: "clamp(22px,4vw,32px) clamp(12px,3vw,18px) 0" }}
+              style={{ padding: "clamp(15px,3vw,22px) clamp(12px,3vw,18px) 0" }}
             >
               <div
                 style={{
@@ -228,7 +227,7 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
               </div>
               <p
                 style={{
-                  margin: "clamp(10px,2vw,16px) 0 0",
+                  margin: "clamp(6px,1.3vw,10px) 0 0",
                   fontFamily: "var(--font-serif)",
                   fontSize: "clamp(16px,2.2vw,21px)",
                   lineHeight: 1.25,
@@ -236,9 +235,9 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                   letterSpacing: "-0.01em",
                 }}
               >
-                Tot ce îți trebuie pentru o{" "}
+                Tot ce-ți trebuie pentru{" "}
                 <span style={{ textTransform: "uppercase" }}>
-                  renovare fără regrete
+                  deciziile corecte
                 </span>
               </p>
               <div
@@ -247,7 +246,7 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                   height: 2,
                   background: "var(--gold)",
                   opacity: 0.75,
-                  margin: "clamp(12px,2.2vw,18px) 0 clamp(4px,1vw,8px)",
+                  margin: "clamp(8px,1.6vw,12px) 0 clamp(1px,0.4vw,3px)",
                 }}
               />
             </div>
@@ -274,7 +273,7 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                 alignItems: "baseline",
                 justifyContent: "space-between",
                 gap: 12,
-                padding: "clamp(14px,3vw,20px) clamp(12px,3vw,18px)",
+                padding: "clamp(10px,2.2vw,14px) clamp(12px,3vw,18px)",
                 borderTop: "1px solid var(--hairline)",
               }}
             >
@@ -309,7 +308,7 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                 style={{
                   background: "var(--navy)",
                   borderRadius: "var(--radius-lg)",
-                  padding: "clamp(18px,3.5vw,26px) clamp(14px,3vw,22px)",
+                  padding: "clamp(13px,2.5vw,18px) clamp(13px,2.6vw,18px)",
                   textAlign: "center",
                 }}
               >
@@ -327,7 +326,7 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
 
                 <div
                   style={{
-                    margin: "clamp(8px,1.6vw,12px) 0 0",
+                    margin: "clamp(4px,1vw,7px) 0 0",
                     display: "flex",
                     alignItems: "baseline",
                     justifyContent: "center",
@@ -337,7 +336,7 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                   <span
                     style={{
                       fontFamily: "var(--font-serif)",
-                      fontSize: "clamp(44px,9vw,64px)",
+                      fontSize: "clamp(34px,7vw,48px)",
                       lineHeight: 1,
                       color: "var(--on-dark)",
                       letterSpacing: "-0.02em",
@@ -347,22 +346,12 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                   </span>
                   <span
                     style={{
-                      fontSize: "clamp(15px,2vw,19px)",
+                      fontSize: "clamp(13px,1.7vw,16px)",
                       color: "var(--on-dark-soft)",
                     }}
                   >
                     lei
                   </span>
-                </div>
-
-                <div
-                  style={{
-                    marginTop: 6,
-                    fontSize: "clamp(12.5px,1.5vw,14px)",
-                    color: "var(--on-dark-soft)",
-                  }}
-                >
-                  O singură plată · economisești {SAVING}
                 </div>
 
                 <button
@@ -371,16 +360,16 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                   className="hv-btn-gold"
                   style={{
                     width: "100%",
-                    marginTop: "clamp(14px,2.6vw,20px)",
+                    marginTop: "clamp(11px,2vw,15px)",
                     fontFamily: "var(--font-sans)",
                     fontWeight: 600,
-                    fontSize: "clamp(15px,1.8vw,17px)",
+                    fontSize: "clamp(14px,1.7vw,16px)",
                     lineHeight: 1.1,
                     color: "var(--navy)",
                     background: "var(--gold)",
                     border: "none",
                     borderRadius: "var(--radius-md)",
-                    padding: "15px 20px",
+                    padding: "13px 18px",
                     cursor: "pointer",
                   }}
                 >
@@ -393,7 +382,7 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
             <div
               style={{
                 padding:
-                  "clamp(12px,2.6vw,16px) clamp(12px,3vw,18px) clamp(16px,3vw,20px)",
+                  "clamp(9px,2vw,12px) clamp(12px,3vw,18px) clamp(11px,2.2vw,14px)",
                 borderTop: "1px solid var(--hairline-soft)",
                 background: "var(--surface-soft)",
               }}

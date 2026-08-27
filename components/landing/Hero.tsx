@@ -2,7 +2,7 @@
 
 import { Reveal } from "../Reveal";
 import { BeforeAfterSlider } from "./BeforeAfterSlider";
-import { btnGhost, btnNavy, goldEm, lead, overline } from "./styles";
+import { btnNavy, goldEm, lead, overline } from "./styles";
 
 /**
  * Hero — the promise and the first transformation.
@@ -17,12 +17,6 @@ import { btnGhost, btnNavy, goldEm, lead, overline } from "./styles";
  * media height — worth a lot here, since almost all traffic is mobile.
  */
 export function Hero({ onStart }: { onStart: () => void }) {
-  const scrollToProof = () => {
-    document
-      .getElementById("proof-anchor")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   return (
     <section
       style={{
@@ -97,28 +91,16 @@ export function Hero({ onStart }: { onStart: () => void }) {
           />
         </Reveal>
 
-        {/* cta — primary + secondary */}
+        {/* cta — a single, undivided call to action */}
         <Reveal style={{ gridArea: "cta" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 20,
-              flexWrap: "wrap",
-            }}
+          <button
+            type="button"
+            onClick={onStart}
+            className="hv-btn-navy"
+            style={btnNavy}
           >
-            <button type="button" onClick={onStart} className="hv-btn-navy" style={btnNavy}>
-              Vreau să-mi văd casa
-            </button>
-            <button
-              type="button"
-              onClick={scrollToProof}
-              className="hv-btn-ghost"
-              style={btnGhost}
-            >
-              Vezi transformările
-            </button>
-          </div>
+            Vreau să-mi văd casa
+          </button>
         </Reveal>
       </div>
     </section>
