@@ -11,15 +11,15 @@ import { section } from "./styles";
 const FAQ = [
   {
     q: "Ce primesc, mai exact?",
-    a: "Cele patru camere ale tale — living, bucătărie, dormitor, baie — transformate în stil clasic-contemporan, pe care ți le prezint live (sau pe email, în funcție de proiect).",
+    a: "Patru camere la alegerea ta — transformate în stil clasic-contemporan, pe care ți le prezint live (sau pe email, în funcție de proiect).",
   },
   {
     q: "Este un plan de execuție?",
     a: "Nu — este un concept vizual care îți arată direcția și atmosfera. Planurile tehnice fac parte din proiectul complet, despre care vorbim în consultație.",
   },
   {
-    q: "Câte camere trimit?",
-    a: "Toate patru: living, bucătărie, dormitor, baie.",
+    q: "Câte camere trimit și care?",
+    a: "Patru, și alegi tu care sunt: living, dining, dormitor, birou, baie, bucătărie — orice combinație vrei. Toate patru sunt necesare.",
   },
   {
     q: "Ce se întâmplă după?",

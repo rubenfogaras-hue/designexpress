@@ -21,11 +21,14 @@ const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/6oU5kw5HhbnEakT5Pl3F602";
 const BUCKET = "design-express-photos";
 const NOTE_LIMIT = 300;
 
+/* Deliberately generic. The slots used to be Living / Bucătărie / Dormitor /
+   Baie, which turned people away when the rooms they wanted redesigned were a
+   dining room, an office or two bedrooms. Four slots, any four rooms. */
 const ROOMS = [
-  { key: "living", label: "Living" },
-  { key: "bucatarie", label: "Bucătărie" },
-  { key: "dormitor", label: "Dormitor" },
-  { key: "baie", label: "Baie" },
+  { key: "camera1", label: "Camera 1" },
+  { key: "camera2", label: "Camera 2" },
+  { key: "camera3", label: "Camera 3" },
+  { key: "camera4", label: "Camera 4" },
 ] as const;
 type RoomKey = (typeof ROOMS)[number]["key"];
 
@@ -449,7 +452,8 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                       lineHeight: 1.55,
                     }}
                   >
-                    Toate patru sunt necesare.{" "}
+                    Orice patru camere vrei — living, dining, dormitor,
+                    birou, baie. Toate patru sunt necesare.{" "}
                     <button
                       type="button"
                       onClick={() => setTipsOpen(true)}
