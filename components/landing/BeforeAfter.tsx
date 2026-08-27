@@ -1,8 +1,8 @@
 "use client";
 
 import { Reveal } from "../Reveal";
-import { AssetImage } from "../AssetImage";
-import { displayH2, figLabel, goldEm, lead, overline } from "./styles";
+import { BeforeAfterSlider } from "./BeforeAfterSlider";
+import { displayH2, goldEm, lead, overline } from "./styles";
 
 const PAIRS = [
   {
@@ -17,7 +17,7 @@ const PAIRS = [
   },
 ];
 
-/** Proof section — two real transformations, before beside after. */
+/** Proof section — two real transformations, each a draggable reveal slider. */
 export function BeforeAfter() {
   return (
     <section
@@ -46,44 +46,27 @@ export function BeforeAfter() {
         </h2>
         <p style={{ ...lead, margin: "20px 0 0", maxWidth: 580 }}>
           Două transformări reale —{" "}
-          <em style={goldEm}>stânga înainte, dreapta după</em>. Cât costă o
-          greșeală de renovare, sute sau mii de euro?
+          <em style={goldEm}>trage de cursor</em> ca să vezi diferența. Cât
+          costă o greșeală de renovare, sute sau mii de euro?
         </p>
 
         <div
           style={{
-            display: "flex",
-            flexDirection: "column",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
             gap: "clamp(28px,4vw,44px)",
             marginTop: 40,
           }}
         >
           {PAIRS.map((pair) => (
-            <div
+            <BeforeAfterSlider
               key={pair.label}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-                gap: 14,
-              }}
-            >
-              <figure style={{ margin: 0 }}>
-                <figcaption style={{ ...figLabel, color: "var(--muted)" }}>
-                  Înainte
-                </figcaption>
-                <AssetImage
-                  src={pair.before}
-                  alt={`${pair.label} înainte`}
-                  muted
-                />
-              </figure>
-              <figure style={{ margin: 0 }}>
-                <figcaption style={{ ...figLabel, color: "var(--gold)" }}>
-                  După
-                </figcaption>
-                <AssetImage src={pair.after} alt={`${pair.label} după`} />
-              </figure>
-            </div>
+              before={pair.before}
+              after={pair.after}
+              caption={pair.label}
+              beforeAlt={`${pair.label} înainte de transformare`}
+              afterAlt={`${pair.label} după transformare`}
+            />
           ))}
         </div>
       </Reveal>

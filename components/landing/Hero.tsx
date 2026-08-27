@@ -1,20 +1,20 @@
 "use client";
 
 import { Reveal } from "../Reveal";
-import { AssetImage } from "../AssetImage";
-import { btnGhost, btnNavy, figLabel, goldEm, lead, overline } from "./styles";
+import { BeforeAfterSlider } from "./BeforeAfterSlider";
+import { btnGhost, btnNavy, goldEm, lead, overline } from "./styles";
 
 /**
- * Hero — the promise and the first before/after pair.
+ * Hero — the promise and the first transformation.
  *
  * Layout reflows via the `.hv-hero` grid (globals.css). Four blocks map to
  * grid areas: `lead` (eyebrow + headline), `sub` (rule + subheadline),
- * `media` (the two photos) and `cta` (buttons).
+ * `media` (the before/after slider) and `cta` (buttons).
  *
- * On desktop the text sits left and the images right. On a phone the order is
- * headline → subheadline → images → buttons, so the whole pitch is read before
- * the proof, and the before/after starts inside the first screen (the header
- * already carries a CTA up top). Sizes are trimmed on mobile to fit the fold.
+ * On desktop the text sits left and the slider right. On a phone the order is
+ * headline → subheadline → slider → buttons, so the whole pitch is read before
+ * the proof. The slider replaced a stacked pair of photos, which halved the
+ * media height — worth a lot here, since almost all traffic is mobile.
  */
 export function Hero({ onStart }: { onStart: () => void }) {
   const scrollToProof = () => {
@@ -49,9 +49,9 @@ export function Hero({ onStart }: { onStart: () => void }) {
               textWrap: "pretty",
             }}
           >
-            Renovezi — și nu vrei{" "}
+            Vrei să renovezi și vrei să-ți vezi ideile,{" "}
             <i style={{ fontStyle: "italic", color: "var(--gold)" }}>
-              timp pierdut, bani irosiți, și materiale risipite?
+              înainte să iei decizii?
             </i>
           </h1>
         </Reveal>
@@ -74,54 +74,27 @@ export function Hero({ onStart }: { onStart: () => void }) {
               ...lead,
               maxWidth: 540,
               margin: 0,
-              fontSize: "clamp(11px,1.7vw,17px)",
-              lineHeight: 1.15,
+              fontSize: "clamp(13.5px,1.8vw,17px)",
+              lineHeight: 1.45,
             }}
           >
-            <strong
-              style={{
-                fontWeight: 700,
-                color: "var(--ink)",
-                textTransform: "uppercase",
-                letterSpacing: "0.02em",
-              }}
-            >
-              Înainte să spargi,
-            </strong>{" "}
-            trimite-mi pozele celor patru camere — living, bucătărie, dormitor,
-            baie. Ți le transform în stil{" "}
-            <em style={{ ...goldEm, fontSize: "clamp(13px,1.6vw,19px)" }}>
-              clasic-contemporan
-            </em>{" "}
-            și <strong style={{ fontWeight: 700 }}>te ajut,</strong>{" "}
-            <em style={{ ...goldEm, fontWeight: 700, fontSize: "clamp(13px,1.6vw,19px)" }}>
-              live
+            Îți arătăm ideile tale prin transformarea camerelor în{" "}
+            <em style={{ ...goldEm, fontSize: "clamp(15px,1.9vw,21px)" }}>
+              casa ta de vis
             </em>
-            <strong style={{ fontWeight: 700 }}>
-              , să faci următorul pas, pentru interiorul dorit.
-            </strong>
+            , în stilul dorit și atmosfera visată.
           </p>
         </Reveal>
 
-        {/* media — before + after */}
+        {/* media — the before/after slider */}
         <Reveal style={{ gridArea: "media" }}>
-          <figure style={{ margin: "0 0 14px" }}>
-            <figcaption style={{ ...figLabel, color: "var(--muted)" }}>
-              Înainte
-            </figcaption>
-            <AssetImage
-              src="/assets/before-bedroom.jpg"
-              alt="Dormitor înainte de transformare"
-              muted
-            />
-          </figure>
-          <figure style={{ margin: 0 }}>
-            <figcaption style={{ ...figLabel, color: "var(--gold)" }}>După</figcaption>
-            <AssetImage
-              src="/assets/after-bedroom.jpg"
-              alt="Dormitor după transformare"
-            />
-          </figure>
+          <BeforeAfterSlider
+            before="/assets/before-bedroom.jpg"
+            after="/assets/after-bedroom.jpg"
+            caption="Dormitor"
+            beforeAlt="Dormitor înainte de transformare"
+            afterAlt="Dormitor după transformare"
+          />
         </Reveal>
 
         {/* cta — primary + secondary */}
