@@ -9,10 +9,10 @@ _The blueprint. Read this and `CLAUDE.MD` before changing anything._
 
 A single-page **landing page + order funnel** for Horizont Visuals, an interior-design
 studio in Târgu Mureș. A homeowner planning a renovation uploads photos of their four
-rooms, answers six short qualifying questions, pays **497 lei**, and receives
+rooms, answers three short qualifying questions, pays **497 lei**, and receives
 photorealistic redesigns in classic-contemporary style — presented **live on a call**.
 
-- **Visitor** → reads the page, opens the wizard, uploads 4 photos, answers 6
+- **Visitor** → reads the page, opens the wizard, uploads 4 photos, answers 3
   questions, enters contact details, pays via Stripe.
 - **Studio (Ruben)** → receives the order, photos, answers and phone number;
   calls the customer to schedule the live presentation.
@@ -29,7 +29,7 @@ No login, no dashboard. Lead capture + payment only.
 | Payments   | Stripe **Payment Link** (hosted redirect)         |
 | Database   | Supabase Postgres (`design_express_clients`)      |
 | Storage    | Supabase Storage (`design-express-photos`, private) |
-| Email      | Titan SMTP via `nodemailer` (`lib/email.ts`)      |
+| Email      | Titan-via-GoDaddy SMTP (smtpout.secureserver.net) via `nodemailer` (`lib/email.ts`)      |
 | Fonts      | `next/font` — Cormorant Garamond + Inter          |
 | Hosting    | Vercel (project `designexpress`)                  |
 
@@ -60,7 +60,7 @@ and the slider halves the height each pair used to take.
 
 **Happy path:** land on `/` → click any CTA → wizard opens →
 **Step 1** upload all 4 room photos (generic slots — see below) →
-**Step 2** answer 6 questions one at a time, optional 300-char note →
+**Step 2** answer 3 questions one at a time (q2 is free text), optional 300-char note →
 **Step 3** name, email, phone, consent → click pay →
 `POST /api/submit-order` saves the order and returns one signed upload URL per photo →
 browser uploads the 4 photos straight to Supabase Storage →
@@ -131,7 +131,9 @@ The Payment Link doesn't call the app back on its own, so a **Stripe webhook**
 `payment_status = paid`, it looks the order up by `client_reference_id`
 (= orderId), then emails the customer once: payment confirmed, we'll call them
 as soon as possible on a working day (Mon–Fri) to schedule the live 20-min
-meeting, and a thank-you. Sent from `info@rubenhorizontvisual.com` via Titan SMTP.
+meeting, and a thank-you. Sent from `info@rubenhorizontvisual.com` over SMTP at
+`smtpout.secureserver.net` — the mailbox is Titan resold through GoDaddy, so
+`smtp.titan.email` does NOT work and answers AccountNotFound.
 
 - Signature is verified with HMAC-SHA256 (`STRIPE_WEBHOOK_SECRET`) — **no Stripe
   API key needed**.
@@ -153,8 +155,11 @@ order_id                  uuid unique
 name                      text
 email                     text
 phone                     text          -- required, min 9 digits
-answers                   jsonb         -- the 6 question answers
-branch                    text          -- 'green' | 'red', derived from answers.q4
+answers                   jsonb         -- the 3 question answers (q1-q3)
+branch                    text          -- 'green' | 'red'. FROZEN: was derived from
+                                        -- answers.q4 (budget), a question the
+                                        -- questionnaire no longer asks. New rows
+                                        -- are always 'red'.
 note                      text          -- the optional "mențiune"
 photo_paths               text[]        -- 4 paths, one per room
 confirmation_email_sent   boolean       -- dedupes the webhook email
@@ -182,15 +187,16 @@ names, one column per question.
 like a paid one in the table. `confirmation_email_sent = true` (column
 `platit_email` in the view) is the marker that money actually arrived.
 
-## The green/red branch
+## The green/red branch — frozen (2026-08-28)
 
-Question 4 asks the renovation budget.
+It used to be derived from question 4, the renovation budget: green for
+`20.000–50.000 €` and above, red for everything else. **That question was removed
+from the questionnaire**, so nothing computes the value any more and every new order
+lands as `red`.
 
-- **green** — `20.000–50.000 €`, `50.000–100.000 €`, or `Peste 100.000 €`.
-- **red** — everything else (`Sub 20.000 €`, `Încă nu știu`).
-
-It is **stored only, never shown to the customer** (decision 1 below). It exists so
-high-intent leads can be spotted in the database.
+The column is kept so historical rows stay readable. It is **stored only, never shown
+to the customer** (decision 1 below). Re-base it on a new signal or drop it — do not
+read it as live lead scoring.
 
 ## Third-party services
 

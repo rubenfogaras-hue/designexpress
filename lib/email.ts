@@ -1,11 +1,13 @@
 import nodemailer from "nodemailer";
 
 /**
- * Sends the post-payment confirmation email through the Titan mailbox
- * (info@rubenhorizontvisual.com) over SMTP. All settings come from env so no
- * credentials live in the code:
- *   SMTP_HOST      (default smtp.titan.email)
- *   SMTP_PORT      (default 465, SSL)
+ * Sends the post-payment confirmation email through the business mailbox
+ * (info@rubenhorizontvisual.com) over SMTP. The mailbox is Titan provisioned
+ * through GoDaddy, so the host is smtpout.secureserver.net — smtp.titan.email
+ * is a different estate and answers AccountNotFound for this address.
+ * All settings come from env so no credentials live in the code:
+ *   SMTP_HOST      (default smtpout.secureserver.net)
+ *   SMTP_PORT      (default 587, STARTTLS; 465 also works)
  *   SMTP_USER      the full mailbox address, also the From/Reply-To
  *   SMTP_PASSWORD  the mailbox password
  */
@@ -17,8 +19,8 @@ let transporter: nodemailer.Transporter | null = null;
 function getTransporter(): nodemailer.Transporter {
   if (transporter) return transporter;
 
-  const host = process.env.SMTP_HOST || "smtp.titan.email";
-  const port = Number(process.env.SMTP_PORT || 465);
+  const host = process.env.SMTP_HOST || "smtpout.secureserver.net";
+  const port = Number(process.env.SMTP_PORT || 587);
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASSWORD;
   if (!user || !pass) {

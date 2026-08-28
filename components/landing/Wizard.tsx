@@ -8,7 +8,7 @@ import { PhotoTipsModal } from "./PhotoTipsModal";
    The three-step order wizard.
 
    1. All four room photos (every one required).
-   2. Six qualifying questions, asked one at a time, plus an optional note.
+   2. Three qualifying questions, asked one at a time, plus an optional note.
    3. Name, email, phone, consent — then pay.
 
    On submit it POSTs the order to /api/submit-order, uploads the four photos
@@ -32,10 +32,24 @@ const ROOMS = [
 ] as const;
 type RoomKey = (typeof ROOMS)[number]["key"];
 
-const QUESTIONS = [
+/** Matches ANSWER_LIMIT in /api/submit-order, which truncates at 200. */
+const ANSWER_LIMIT = 200;
+
+type Question =
+  | {
+      id: string;
+      num: string;
+      label: string;
+      kind: "choice";
+      opts: readonly string[];
+    }
+  | { id: string; num: string; label: string; kind: "text"; placeholder: string };
+
+const QUESTIONS: readonly Question[] = [
   {
     id: "q1",
     num: "01",
+    kind: "choice",
     label: "În ce etapă sunteți?",
     opts: [
       "Căutăm încă locuința potrivită",
@@ -45,20 +59,18 @@ const QUESTIONS = [
     ],
   },
   {
+    // Free text: the answers here are too varied to put in a list, and what
+    // people write in their own words is more useful on the call.
     id: "q2",
     num: "02",
-    label: "La ce decizie sunteți blocat acum?",
-    opts: [
-      "Configurația spațiului",
-      "Bugetul",
-      "Materialele",
-      "Meșterii",
-      "Toate de mai sus. Sincer.",
-    ],
+    kind: "text",
+    label: "V-ați gândit la un stil anume sau o atmosferă pentru noul interior?",
+    placeholder: "Ex: minimalist cald, mult lemn și tonuri naturale.",
   },
   {
     id: "q3",
     num: "03",
+    kind: "choice",
     label: "Ce regret vreți să evitați cel mai mult?",
     opts: [
       "Să cheltui de două ori",
@@ -67,45 +79,7 @@ const QUESTIONS = [
       "Să mă cert cu partenerul",
     ],
   },
-  {
-    id: "q4",
-    num: "04",
-    label: "Care este ordinul de mărime al bugetului?",
-    opts: [
-      "Sub 20.000 €",
-      "20.000–50.000 €",
-      "50.000–100.000 €",
-      "Peste 100.000 €",
-      "Încă nu știu. Caut un reper realist.",
-    ],
-  },
-  {
-    id: "q5",
-    num: "05",
-    label: "În ce oraș este locuința?",
-    opts: [
-      "Târgu Mureș",
-      "Cluj-Napoca",
-      "București",
-      "Alt oraș din Transilvania",
-      "Alt oraș din România",
-    ],
-  },
-  {
-    id: "q6",
-    num: "06",
-    label: "Cum credeți că vă putem ajuta cel mai mult?",
-    opts: [
-      "O oră de claritate",
-      "Proiectul complet — design, materiale, coordonare",
-      "Să verificați ce avem deja",
-      "Nu sunt sigur. Vreau doar să vorbim.",
-    ],
-  },
-] as const;
-
-/** Budget answers that mark a high-intent lead. Stored, not shown. */
-const GREEN_BUDGETS = ["20.000–50.000 €", "50.000–100.000 €", "Peste 100.000 €"];
+];
 
 const STEP_TITLES: Record<number, string> = {
   1: "Cele patru camere",
@@ -210,6 +184,10 @@ export function Wizard({ onClose }: { onClose: () => void }) {
     setQIndex((i) => (index === i ? i + 1 : i));
   };
 
+  /** Free-text answers are typed, so they are stored without advancing. */
+  const typeAnswer = (id: string, value: string) =>
+    setAnswers((prev) => ({ ...prev, [id]: value.slice(0, ANSWER_LIMIT) }));
+
   const back = () => {
     if (step === 2) {
       if (qIndex > 0) setQIndex((i) => i - 1);
@@ -230,8 +208,9 @@ export function Wizard({ onClose }: { onClose: () => void }) {
         file: photos[r.key]!.file,
       }));
 
-      const branch = GREEN_BUDGETS.includes(answers.q4 ?? "") ? "green" : "red";
-
+      // The green/red split was derived from the old budget question (q4),
+      // which the questionnaire no longer asks. Nothing is sent, so the API
+      // falls back to its "red" default until a new signal replaces it.
       const res = await fetch("/api/submit-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -242,7 +221,6 @@ export function Wizard({ onClose }: { onClose: () => void }) {
           note,
           consent,
           answers,
-          branch,
           photos: selected.map(({ room, file }) => ({ room, type: file.type })),
         }),
       });
@@ -736,6 +714,68 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                           </span>
                         </div>
 
+                        {current.kind === "text" && (
+                          <div>
+                            <textarea
+                              autoFocus
+                              maxLength={ANSWER_LIMIT}
+                              value={answers[current.id] ?? ""}
+                              onChange={(e) =>
+                                typeAnswer(current.id, e.target.value)
+                              }
+                              placeholder={current.placeholder}
+                              rows={3}
+                              className="hv-input"
+                              style={{
+                                ...inputBase,
+                                padding: "14px 16px",
+                                lineHeight: 1.5,
+                                border: "1px solid var(--hairline)",
+                                resize: "vertical",
+                              }}
+                            />
+                            <div
+                              style={{
+                                marginTop: 8,
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                gap: 12,
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontSize: 12,
+                                  color: "var(--muted-soft)",
+                                }}
+                              >
+                                {(answers[current.id] ?? "").length}/
+                                {ANSWER_LIMIT}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setQIndex((i) => i + 1)}
+                                disabled={
+                                  !(answers[current.id] ?? "").trim()
+                                }
+                                className="hv-btn-navy"
+                                style={{
+                                  ...primaryBtn,
+                                  opacity: (answers[current.id] ?? "").trim()
+                                    ? 1
+                                    : 0.45,
+                                  cursor: (answers[current.id] ?? "").trim()
+                                    ? "pointer"
+                                    : "not-allowed",
+                                }}
+                              >
+                                Continuă →
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {current.kind === "choice" && (
                         <div
                           style={{
                             display: "flex",
@@ -794,6 +834,7 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                             );
                           })}
                         </div>
+                        )}
                       </div>
                     )}
 
@@ -817,7 +858,8 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                               fontWeight: 500,
                             }}
                           >
-                            Mențiune / ce nu-ți place (opțional)
+                            Menționați dacă aveți elemente care neapărat vă plac
+                            sau vă displac
                           </span>
                           <span
                             style={{ fontSize: 12, color: "var(--muted-soft)" }}
@@ -825,13 +867,24 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                             {note.length}/{NOTE_LIMIT}
                           </span>
                         </div>
+                        <p
+                          style={{
+                            margin: "0 0 10px",
+                            fontFamily: "var(--font-serif)",
+                            fontStyle: "italic",
+                            fontSize: 15,
+                            lineHeight: 1.45,
+                            color: "var(--muted)",
+                          }}
+                        >
+                          ex: urăsc culoarea gri, vreau blat din marmură, etc.
+                        </p>
                         <textarea
                           maxLength={NOTE_LIMIT}
                           value={note}
                           onChange={(e) =>
                             setNote(e.target.value.slice(0, NOTE_LIMIT))
                           }
-                          placeholder="Ex: nu-mi place griul rece, vreau lemn cald și mai multă lumină."
                           rows={3}
                           className="hv-input"
                           style={{

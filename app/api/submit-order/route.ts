@@ -6,7 +6,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/server";
 export const runtime = "nodejs";
 
 const ROOM_KEYS = ["camera1", "camera2", "camera3", "camera4"];
-const QUESTION_KEYS = ["q1", "q2", "q3", "q4", "q5", "q6"];
+const QUESTION_KEYS = ["q1", "q2", "q3"];
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": ".jpg",
   "image/png": ".png",
