@@ -25,7 +25,12 @@
 -- historical rows stay readable — but it is frozen, not live. Tell Claude if
 -- you want it re-based on a new signal or removed.
 
-create or replace view public.design_express_answers
+-- The view must be dropped rather than replaced: `create or replace view` can
+-- only append columns, and this drops three (buget, oras, cum_putem_ajuta).
+-- Dropping a view removes no data — it is only a saved query over the table.
+drop view if exists public.design_express_answers;
+
+create view public.design_express_answers
 with (security_invoker = true) as
 select
   to_char(created_at at time zone 'Europe/Bucharest', 'YYYY-MM-DD HH24:MI') as data,
