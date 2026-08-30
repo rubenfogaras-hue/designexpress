@@ -362,26 +362,6 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                   </span>
                 </div>
 
-                {/* Capacity, stated plainly. It is a real constraint — the
-                    48-hour promise only holds because intake is capped — so it
-                    sits directly above the button, where the decision is. */}
-                <p
-                  style={{
-                    margin: "clamp(11px,2vw,15px) 0 0",
-                    fontFamily: "var(--font-sans)",
-                    fontWeight: 700,
-                    fontSize: "clamp(12.5px,1.5vw,14px)",
-                    lineHeight: 1.45,
-                    color: "#ffffff",
-                    textWrap: "pretty",
-                  }}
-                >
-                  <span style={{ color: "#ff5a5a" }}>
-                    Iau 5 proiecte pe săptămână.
-                  </span>{" "}
-                  Ca să livrez în 48 de ore, nu pot mai multe.
-                </p>
-
                 <button
                   type="button"
                   onClick={onStart}
@@ -403,6 +383,30 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                 >
                   Vreau să-mi văd casa →
                 </button>
+
+                {/* Capacity, sitting under the CTA as its own red block. The
+                    cap is real — the 48-hour promise only holds because intake
+                    is limited — so it reads as a reason, not a countdown. */}
+                <div
+                  style={{
+                    marginTop: "clamp(8px,1.6vw,11px)",
+                    background: "#c0392b",
+                    borderRadius: "var(--radius-md)",
+                    padding: "11px 14px",
+                    textAlign: "center",
+                    fontFamily: "var(--font-sans)",
+                    fontWeight: 700,
+                    fontSize: "clamp(12px,1.45vw,13.5px)",
+                    lineHeight: 1.4,
+                    color: "#ffffff",
+                    textWrap: "pretty",
+                  }}
+                >
+                  Iau 5 proiecte pe săptămână.
+                  <span style={{ display: "block", fontWeight: 500 }}>
+                    Ca să livrez în 48 de ore, nu pot mai multe.
+                  </span>
+                </div>
               </div>
             </div>
 
