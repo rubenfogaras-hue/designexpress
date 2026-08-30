@@ -36,10 +36,15 @@ const ITEMS = [
 
 /* Sold separately, on top of the 297 lei — deliberately excluded from the total
    so the price only ever counts what is actually included. */
+/**
+ * The paid add-on, sold separately. It mirrors the cross-sell attached to the
+ * Stripe Payment Link — if one changes, change the other, or the page and the
+ * checkout disagree in front of the customer.
+ */
 const OPTIONAL = {
-  title: "Lista achiziții",
-  desc: "Obiectele și iluminatul folosit în design, cu link de unde le iei.",
-  price: "200 lei",
+  title: "Ideile Tale pe Plan",
+  desc: "Planul ideilor tale cu organizare și cote.",
+  price: "97 lei",
 };
 
 const TOTAL = "1.250 lei";

@@ -114,8 +114,8 @@ so the discount reads from the struck 1.250 against the price directly below it.
 The card itself is ivory (`--canvas`) on the navy section, so it reads as a
 printed page laid on the dark band.
 
-Below the navy block sits one **optional add-on, sold separately** — "Lista
-achiziții", +200 lei, on a tinted strip headed "Opțional · nu e inclus în preț",
+Below the navy block sits one **optional add-on, sold separately** — "Ideile
+Tale pe Plan", +97 lei, on a tinted strip headed "Opțional · nu e inclus în preț",
 with a gold `+` badge and its price **not** struck through. It is deliberately
 **excluded** from the 1.250 lei total and from the savings figure, because it is
 not part of what 297 lei buys. Keep it that way: the struck-through total must
