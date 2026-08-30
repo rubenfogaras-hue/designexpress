@@ -182,11 +182,19 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
             textWrap: "pretty",
           }}
         >
-          Vezi interiorul{" "}
-          <i style={{ fontStyle: "italic", color: "var(--gold-300)" }}>
-            înainte să spargi
-          </i>{" "}
-          un perete sau să comanzi materialul greșit.
+          Vezi interiorul înainte să spargi un perete —{" "}
+          <i
+            style={{
+              fontStyle: "italic",
+              color: "var(--gold-300)",
+              textDecoration: "underline",
+              textUnderlineOffset: "0.12em",
+              textDecorationThickness: "from-font",
+            }}
+          >
+            prin imagini 95% reale în mai puțin de 48 de ore
+          </i>
+          .
         </h2>
 
         <div

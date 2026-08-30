@@ -2,7 +2,7 @@
 
 import { Reveal } from "../Reveal";
 import { BeforeAfterSlider } from "./BeforeAfterSlider";
-import { btnNavy, goldEm, lead, overline } from "./styles";
+import { btnNavy, lead, overline } from "./styles";
 
 /**
  * Hero — the promise and the first transformation.
@@ -72,11 +72,11 @@ export function Hero({ onStart }: { onStart: () => void }) {
               lineHeight: 1.45,
             }}
           >
-            Îți arătăm ideile tale prin transformarea camerelor în{" "}
-            <em style={{ ...goldEm, fontSize: "clamp(15px,1.9vw,21px)" }}>
-              casa ta de vis
-            </em>
-            , în stilul dorit și atmosfera visată.
+            Îți arătăm ideile tale prin transformarea camerelor în stilul și
+            atmosfera dorită,{" "}
+            <strong style={{ fontWeight: 700, color: "var(--ink)" }}>
+              prin imagini 95% reale (nu prostii AI) în mai puțin de 48 de ore.
+            </strong>
           </p>
         </Reveal>
 
