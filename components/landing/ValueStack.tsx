@@ -362,6 +362,26 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                   </span>
                 </div>
 
+                {/* Capacity, stated plainly. It is a real constraint — the
+                    48-hour promise only holds because intake is capped — so it
+                    sits directly above the button, where the decision is. */}
+                <p
+                  style={{
+                    margin: "clamp(11px,2vw,15px) 0 0",
+                    fontFamily: "var(--font-sans)",
+                    fontWeight: 700,
+                    fontSize: "clamp(12.5px,1.5vw,14px)",
+                    lineHeight: 1.45,
+                    color: "#ffffff",
+                    textWrap: "pretty",
+                  }}
+                >
+                  <span style={{ color: "#ff5a5a" }}>
+                    Iau 5 proiecte pe săptămână.
+                  </span>{" "}
+                  Ca să livrez în 48 de ore, nu pot mai multe.
+                </p>
+
                 <button
                   type="button"
                   onClick={onStart}
