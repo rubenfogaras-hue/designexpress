@@ -50,7 +50,7 @@ export function SiteFooter({ onStart }: { onStart: () => void }) {
             className="hv-btn-cream"
             style={{ ...btnCream, marginTop: 30 }}
           >
-            Vreau să-mi văd casa — 497 lei
+            Vreau să-mi văd casa — 297 lei
           </button>
         </div>
 

@@ -17,7 +17,7 @@ import { PhotoTipsModal } from "./PhotoTipsModal";
    navigating away cancels anything still in flight.
 ──────────────────────────────────────────────────────────────────────── */
 
-const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/cNi9AM2v5bnEgJhcdJ3F605";
+const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/6oU5kw5HhbnEakT5Pl3F602";
 const BUCKET = "design-express-photos";
 const NOTE_LIMIT = 300;
 
@@ -302,7 +302,7 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                 lineHeight: 1,
               }}
             >
-              <span style={{ color: "var(--gold-300)" }}>Începe acum</span> — 497
+              <span style={{ color: "var(--gold-300)" }}>Începe acum</span> — 297
               lei.
             </span>
             <button
@@ -1076,7 +1076,7 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                           fontSize: 26,
                         }}
                       >
-                        497 lei
+                        297 lei
                       </span>
                     </div>
 
@@ -1096,7 +1096,7 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                     >
                       {submitting
                         ? "Se redirecționează către plată…"
-                        : "Vreau să-mi văd casa — 497 lei"}
+                        : "Vreau să-mi văd casa — 297 lei"}
                     </button>
                     <p
                       style={{

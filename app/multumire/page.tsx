@@ -108,7 +108,7 @@ export default function ThankYou() {
                 fontSize: 16,
               }}
             >
-              497 lei
+              297 lei
             </span>{" "}
             se scad din proiectul complet — vorbim despre asta în discuția live.
           </p>

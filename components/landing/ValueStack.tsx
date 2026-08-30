@@ -3,7 +3,7 @@
 import { Reveal } from "../Reveal";
 import { BeforeAfterSlider } from "./BeforeAfterSlider";
 
-/* What's included in the 497 lei. "Dacă le-ai cumpăra separat" below is the sum
+/* What's included in the 297 lei. "Dacă le-ai cumpăra separat" below is the sum
    of these prices — 1.250 lei — so keep the two in step when editing. */
 const ITEMS = [
   {
@@ -34,7 +34,7 @@ const ITEMS = [
   },
 ];
 
-/* Sold separately, on top of the 497 lei — deliberately excluded from the total
+/* Sold separately, on top of the 297 lei — deliberately excluded from the total
    so the price only ever counts what is actually included. */
 const OPTIONAL = {
   title: "Lista achiziții",
@@ -43,7 +43,7 @@ const OPTIONAL = {
 };
 
 const TOTAL = "1.250 lei";
-const TODAY = "497";
+const TODAY = "297";
 
 /** Numbered badge — navy for what's included, gold for the add-on. */
 function Badge({ n, tone }: { n: number | string; tone: "navy" | "gold" }) {
@@ -146,7 +146,7 @@ function Row({
  * The offer — a numbered value stack on ivory: every included item with its
  * standalone value struck through, what the lot would cost separately, then a
  * navy block with today's price and the CTA. The one add-on that is *not* part
- * of the 497 lei sits below that block, clearly fenced off, and is excluded
+ * of the 297 lei sits below that block, clearly fenced off, and is excluded
  * from both the total and the savings figure.
  */
 export function ValueStack({ onStart }: { onStart: () => void }) {

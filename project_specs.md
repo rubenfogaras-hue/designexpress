@@ -9,7 +9,7 @@ _The blueprint. Read this and `CLAUDE.MD` before changing anything._
 
 A single-page **landing page + order funnel** for Horizont Visuals, an interior-design
 studio in Târgu Mureș. A homeowner planning a renovation uploads photos of their four
-rooms, answers three short qualifying questions, pays **497 lei**, and receives
+rooms, answers three short qualifying questions, pays **297 lei**, and receives
 photorealistic redesigns in classic-contemporary style — presented **live on a call**.
 
 - **Visitor** → reads the page, opens the wizard, uploads 4 photos, answers 3
@@ -90,7 +90,7 @@ Living, Bucătărie, Baie) — those are Ruben's own finished projects, not slot
 
 ## The offer (single source of truth: the code)
 
-**497 lei.** The number appears in `Wizard.tsx` (header, total, pay button),
+**297 lei.** The number appears in `Wizard.tsx` (header, total, pay button),
 `ValueStack.tsx` (price block + CTA), `SiteFooter.tsx` (CTA), `app/layout.tsx`
 (meta description) and `app/multumire/page.tsx`. Change all of them together.
 
@@ -107,7 +107,7 @@ The value stack (`ValueStack.tsx`) lists five **included** items:
 
 Each item has a numbered navy badge, a bold title, a muted one-line description
 and its standalone value struck through. Below the list: "Dacă le-ai cumpăra
-separat 1.250 lei" struck, then a navy block — "Prețul tău azi", **497 lei** —
+separat 1.250 lei" struck, then a navy block — "Prețul tău azi", **297 lei** —
 and the gold CTA. There is no savings line: it was removed on Ruben's request,
 so the discount reads from the struck 1.250 against the price directly below it.
 
@@ -118,7 +118,7 @@ Below the navy block sits one **optional add-on, sold separately** — "Lista
 achiziții", +200 lei, on a tinted strip headed "Opțional · nu e inclus în preț",
 with a gold `+` badge and its price **not** struck through. It is deliberately
 **excluded** from the 1.250 lei total and from the savings figure, because it is
-not part of what 497 lei buys. Keep it that way: the struck-through total must
+not part of what 297 lei buys. Keep it that way: the struck-through total must
 only ever be the sum of the included items.
 
 If you change any item price, recompute `TOTAL` (the sum of `ITEMS`). It must
@@ -200,8 +200,8 @@ read it as live lead scoring.
 
 ## Third-party services
 
-- **Stripe** — Payment Link `https://buy.stripe.com/cNi9AM2v5bnEgJhcdJ3F605`
-  (497 RON, live), hard-coded in `components/landing/Wizard.tsx`. Set to
+- **Stripe** — Payment Link `https://buy.stripe.com/6oU5kw5HhbnEakT5Pl3F602`
+  (297 RON, live), hard-coded in `components/landing/Wizard.tsx`. Set to
   `hosted_confirmation`. No Stripe API key is used anywhere in the app.
 - **Supabase** — Postgres + Storage. Server-side `service_role` key for writes and
   signed URLs; public anon key in the browser only to PUT to a signed URL.
