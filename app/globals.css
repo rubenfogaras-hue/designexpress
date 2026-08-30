@@ -159,6 +159,16 @@ body {
   box-shadow: var(--shadow-hover);
 }
 
+/* White CTA — needs its own hover, the gold one repaints the background. */
+.hv-btn-white {
+  transition: background var(--dur-base) var(--ease),
+    box-shadow var(--dur-base) var(--ease);
+}
+.hv-btn-white:hover {
+  background: var(--surface-soft);
+  box-shadow: var(--shadow-hover);
+}
+
 /* Upload tile */
 .hv-tile {
   transition: border-color var(--dur-base) var(--ease);

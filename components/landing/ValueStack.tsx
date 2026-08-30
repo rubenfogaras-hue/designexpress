@@ -370,16 +370,16 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                 <button
                   type="button"
                   onClick={onStart}
-                  className="hv-btn-gold"
+                  className="hv-btn-white"
                   style={{
                     width: "100%",
                     marginTop: "clamp(11px,2vw,15px)",
                     fontFamily: "var(--font-sans)",
-                    fontWeight: 600,
+                    fontWeight: 800,
                     fontSize: "clamp(14px,1.7vw,16px)",
                     lineHeight: 1.1,
                     color: "var(--navy)",
-                    background: "var(--gold)",
+                    background: "#ffffff",
                     border: "none",
                     borderRadius: "var(--radius-md)",
                     padding: "13px 18px",
@@ -407,7 +407,8 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
                     textWrap: "pretty",
                   }}
                 >
-                  Iau 5 proiecte pe săptămână.
+                  Iau <span style={{ fontWeight: 900 }}>DOAR</span> 5 proiecte pe
+                  săptămână.
                   <span style={{ display: "block", fontWeight: 500 }}>
                     Ca să livrez în 48 de ore, nu pot mai multe.
                   </span>
