@@ -99,10 +99,10 @@ The value stack (`ValueStack.tsx`) lists five **included** items:
 | # | Item | Value |
 | --- | --- | --- |
 | 1 | Cele 4 camere transformate | 400 lei |
-| 2 | Discuție live 1-la-1 cu designerul *(highlighted row)* | 500 lei |
+| 2 | Discuție live *(highlighted row)* | 500 lei |
 | 3 | Moodboard | 200 lei |
 | 4 | Harta luminii | 100 lei |
-| 5 | Interior personalizat | 50 lei |
+| 5 | Prezentarea interiorului făcut | 50 lei |
 | | **Dacă le-ai cumpăra separat** | **1.250 lei** |
 
 Each item has a numbered navy badge, a bold title, a muted one-line description

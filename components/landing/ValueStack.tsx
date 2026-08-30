@@ -12,8 +12,8 @@ const ITEMS = [
     price: "400 lei",
   },
   {
-    title: "Discuție live 1-la-1 cu designerul",
-    desc: "Îți explic fiecare alegere, în direct, și răspund la orice întrebare.",
+    title: "Discuție live",
+    desc: "Să vorbim despre ce doriți și cum.",
     price: "500 lei",
     highlight: true,
   },
@@ -28,8 +28,8 @@ const ITEMS = [
     price: "100 lei",
   },
   {
-    title: "Interior personalizat",
-    desc: "Bazat pe răspunsurile tale, nu pe un șablon.",
+    title: "Prezentarea interiorului făcut",
+    desc: "Explic fiecare alegere și răspund la orice întrebare.",
     price: "50 lei",
   },
 ];
