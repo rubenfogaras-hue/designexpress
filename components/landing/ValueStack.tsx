@@ -28,8 +28,8 @@ const ITEMS = [
     price: "100 lei",
   },
   {
-    title: "Prezentarea interiorului făcut",
-    desc: "Explic fiecare alegere și răspund la orice întrebare.",
+    title: "Discuție live 2 — Prezentarea",
+    desc: "Prezentarea vizualizării, unde explic fiecare alegere și răspund la orice întrebare.",
     price: "50 lei",
   },
 ];
@@ -451,11 +451,11 @@ export function ValueStack({ onStart }: { onStart: () => void }) {
 
           {/* ── proof beside the offer ─────────────────────────────────── */}
           <BeforeAfterSlider
-            before="/assets/before-bathroom.jpg"
-            after="/assets/after-bathroom.jpg"
-            caption="Baie"
-            beforeAlt="Baie înainte de transformare"
-            afterAlt="Baie după transformare"
+            before="/assets/before-copil.jpg"
+            after="/assets/after-copil.jpg"
+            caption="Cameră de copil"
+            beforeAlt="Cameră de copil înainte de transformare"
+            afterAlt="Cameră de copil după transformare"
             onDark
           />
         </div>
