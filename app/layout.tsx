@@ -59,16 +59,12 @@ s.parentNode.insertBefore(t,s)}(window, document,'script',
 fbq('init', '${META_PIXEL_ID}');
 fbq('track', 'PageView');`}
         </Script>
-        <noscript>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
-            alt=""
-          />
-        </noscript>
+        {/* Meta's snippet also ships a <noscript> beacon for visitors without
+            JavaScript. It is deliberately left out: React emits a
+            <link rel="preload" as="image"> for that <img>, which makes every
+            normal browser fetch the tracking URL as well — so each visit
+            counted twice. Anyone without JavaScript cannot use the wizard
+            anyway, so nothing measurable is lost. */}
         {children}
       </body>
     </html>
