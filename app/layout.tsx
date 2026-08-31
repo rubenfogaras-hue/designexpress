@@ -10,7 +10,7 @@ import "./globals.css";
  * present on the page in order to run at all. Do not add fbq('track', ...)
  * calls here: they would double-count against the events configured there.
  */
-const META_PIXEL_ID = "1869559314737199";
+const META_PIXEL_ID = "1456331533029480";
 
 // Display / headings — serif, light weights, italic emphasis on a key word.
 const cormorant = Cormorant_Garamond({
@@ -59,31 +59,6 @@ s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '${META_PIXEL_ID}');
 fbq('track', 'PageView');`,
-        }}
-      />
-      {/* Signals Gateway — serves the tracking SDK from a first-party domain
-          so ad blockers do not strip it.
-
-          NOTE: the host below does not currently resolve, so this script
-          fails to load and sends nothing. It becomes live once the gateway is
-          deployed on a subdomain that is actually owned and pointed at it
-          (e.g. sgw.rubenhorizontvisual.com); at that point replace the two
-          URLs here with the ones Meta issues. The standard pixel above is
-          unaffected either way. */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `!function(a,h,e,v,n,t,s)
-  {if(a.cbq)return;n=a.cbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!a._cbq)a._cbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=h.createElement(e);t.async=!0;
-  t.src=v;s=h.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://Rubenhorizontvisual.gmail.com/sdk/1999592750190783254/events.js');
-
-cbq('setHost', 'https://Rubenhorizontvisual.gmail.com/');
-cbq('init', '1999592750190783254');
-cbq('track', 'PageView');`,
         }}
       />
       <body className="font-sans">
