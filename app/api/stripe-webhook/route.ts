@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 import { sendConfirmationEmail } from "@/lib/email";
+import { sendPurchaseEvent } from "@/lib/meta-capi";
 
 // Needs the Node runtime (crypto, SMTP, the Supabase admin client) and the
 // raw request body — so no edge runtime and no body parsing before verifying.
@@ -75,7 +76,9 @@ export async function POST(req: NextRequest) {
   const session = (event.data?.object ?? {}) as {
     client_reference_id?: string;
     payment_status?: string;
-    customer_details?: { email?: string; name?: string };
+    customer_details?: { email?: string; name?: string; phone?: string };
+    amount_total?: number;
+    currency?: string;
   };
   if (session.payment_status !== "paid") {
     return NextResponse.json({ received: true });
@@ -92,13 +95,14 @@ export async function POST(req: NextRequest) {
     // is no row (unexpected), fall back to the payer's Stripe details.
     let toEmail = payerEmail;
     let name = payerName;
+    let phone = session.customer_details?.phone || "";
     let alreadySent = false;
     let rowId: string | null = null;
 
     if (orderId) {
       const { data, error } = await supabase
         .from("design_express_clients")
-        .select("id, name, email, confirmation_email_sent")
+        .select("id, name, email, phone, confirmation_email_sent")
         .eq("order_id", orderId)
         .maybeSingle();
       if (error) {
@@ -107,6 +111,7 @@ export async function POST(req: NextRequest) {
         rowId = data.id as string;
         toEmail = (data.email as string) || toEmail;
         name = (data.name as string) || name;
+        phone = (data.phone as string) || phone;
         alreadySent = data.confirmation_email_sent === true;
       }
     }
@@ -122,6 +127,27 @@ export async function POST(req: NextRequest) {
 
     await sendConfirmationEmail({ to: toEmail, name });
     console.log(`[stripe-webhook] confirmation email sent to ${toEmail} (order=${orderId})`);
+
+    // Tell Meta the sale actually happened. The browser pixel never sees this —
+    // payment completes on Stripe's domain — so this is the only honest source
+    // of Purchase. It uses the amount Stripe really charged, which includes the
+    // cross-sell when the customer took it. Failures are logged, never thrown:
+    // the order is already complete and Stripe still needs its 200.
+    const purchase = await sendPurchaseEvent({
+      orderId: orderId || (rowId ?? "unknown"),
+      email: toEmail,
+      phone,
+      name,
+      value:
+        typeof session.amount_total === "number"
+          ? session.amount_total / 100
+          : 297,
+      currency: (session.currency || "ron").toUpperCase(),
+    });
+    console.log(
+      `[stripe-webhook] Meta Purchase (order=${orderId}):`,
+      purchase.sent ? "sent" : `not sent — ${purchase.detail}`,
+    );
 
     // Mark it sent so Stripe's retries don't email the customer twice.
     if (rowId) {
