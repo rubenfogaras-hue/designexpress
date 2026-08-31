@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
+import { OFFER_CURRENCY, OFFER_VALUE, trackPixel } from "@/lib/meta-pixel";
 import { PhotoTipsModal } from "./PhotoTipsModal";
 
 /* ────────────────────────────────────────────────────────────────────────
@@ -235,6 +236,15 @@ export function Wizard({ onClose }: { onClose: () => void }) {
       const { orderId, uploads } = await res.json();
       if (!orderId) throw new Error("Comanda nu a putut fi înregistrată.");
 
+      // The details are captured and stored — this is the lead. Fired here
+      // rather than at the redirect so it still counts if the photo upload
+      // fails afterwards; the contact information is ours either way.
+      trackPixel("Lead", {
+        value: OFFER_VALUE,
+        currency: OFFER_CURRENCY,
+        content_name: "Design Express",
+      });
+
       const supabase = getSupabaseBrowser();
       const results = await Promise.all(
         selected.map(({ file }, i) => {
@@ -251,6 +261,14 @@ export function Wizard({ onClose }: { onClose: () => void }) {
           "Pozele nu au putut fi încărcate. Verifică semnalul și încearcă din nou."
         );
       }
+
+      // Everything landed; the customer is on their way to pay.
+      trackPixel("InitiateCheckout", {
+        value: OFFER_VALUE,
+        currency: OFFER_CURRENCY,
+        content_name: "Design Express",
+        num_items: ROOMS.length,
+      });
 
       const payUrl = new URL(STRIPE_PAYMENT_LINK);
       payUrl.searchParams.set("client_reference_id", orderId);
