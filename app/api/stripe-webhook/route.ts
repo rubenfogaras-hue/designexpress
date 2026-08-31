@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 import { sendConfirmationEmail } from "@/lib/email";
-import { sendPurchaseEvent } from "@/lib/meta-capi";
+import { sendServerEvent } from "@/lib/meta-capi";
 
 // Needs the Node runtime (crypto, SMTP, the Supabase admin client) and the
 // raw request body — so no edge runtime and no body parsing before verifying.
@@ -133,7 +133,10 @@ export async function POST(req: NextRequest) {
     // of Purchase. It uses the amount Stripe really charged, which includes the
     // cross-sell when the customer took it. Failures are logged, never thrown:
     // the order is already complete and Stripe still needs its 200.
-    const purchase = await sendPurchaseEvent({
+    const purchase = await sendServerEvent({
+      eventName: "Purchase",
+      // The order id doubles as the dedup key, so a Stripe retry counts once.
+      eventId: orderId || (rowId ?? "unknown"),
       orderId: orderId || (rowId ?? "unknown"),
       email: toEmail,
       phone,

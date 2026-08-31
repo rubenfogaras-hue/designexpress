@@ -1,15 +1,17 @@
 import crypto from "node:crypto";
 
 /**
- * Meta Conversions API — the Purchase event, sent server-side.
+ * Meta Conversions API — server-side events.
  *
- * The browser pixel cannot see a purchase: payment completes on Stripe's own
- * domain. This runs from the Stripe webhook, which is the only place that
- * knows money actually arrived, and it is verified by Stripe's signature
- * before we ever get here.
+ * Two jobs:
  *
- * Server-side also means ad blockers cannot remove it, and we can attach
- * hashed contact details so Meta can match the buyer back to the ad they saw.
+ *  1. `Purchase`, which the browser can never see: payment completes on
+ *     Stripe's own domain.
+ *  2. A server copy of the browser events (`Lead`, `InitiateCheckout`). Each
+ *     pair shares an `event_id`, so Meta keeps whichever arrives and discards
+ *     the duplicate. When an ad blocker kills the browser copy, the server one
+ *     still lands — which is the coverage Meta's checklist asks for and the
+ *     Event Setup Tool structurally cannot provide.
  *
  *   META_PIXEL_ID         the dataset id (public — it ships in the page too)
  *   META_CAPI_TOKEN       Events Manager -> Settings -> Conversions API
@@ -47,60 +49,66 @@ function hashName(part: string): string | null {
   return clean ? hash(clean) : null;
 }
 
-export type PurchasePayload = {
-  /** Our order id — also the deduplication key, so retries never double-count. */
-  orderId: string;
+export type ServerEvent = {
+  eventName: "Lead" | "InitiateCheckout" | "Purchase";
+  /** Must match the browser event's eventID, or Meta counts it twice. */
+  eventId: string;
   email?: string | null;
   phone?: string | null;
   name?: string | null;
-  /** Actual amount paid, major units. Includes the cross-sell if they took it. */
-  value: number;
-  currency: string;
+  /** Meta's browser cookies, when the page managed to read them. */
+  fbp?: string | null;
+  fbc?: string | null;
+  value?: number;
+  currency?: string;
+  orderId?: string | null;
 };
 
 /**
- * Sends one Purchase event. Never throws and never blocks the webhook — a
- * missing analytics event is worth far less than a confirmed order, and Stripe
- * must still get its 200.
+ * Sends one event. Never throws — a missing analytics event is worth far less
+ * than the order it describes, and the caller (an API route or the Stripe
+ * webhook) must finish its real work regardless.
  */
-export async function sendPurchaseEvent(
-  payload: PurchasePayload,
+export async function sendServerEvent(
+  event: ServerEvent,
 ): Promise<{ sent: boolean; detail?: string }> {
   const pixelId = process.env.META_PIXEL_ID;
   const token = process.env.META_CAPI_TOKEN;
 
   if (!pixelId || !token) {
-    console.warn("[meta-capi] not configured — skipping Purchase");
+    console.warn(`[meta-capi] not configured — skipping ${event.eventName}`);
     return { sent: false, detail: "not configured" };
   }
 
-  const [first, ...rest] = (payload.name ?? "").trim().split(/\s+/);
-  const userData: Record<string, string[]> = {};
-  const em = payload.email ? hashEmail(payload.email) : null;
-  const ph = payload.phone ? hashPhone(payload.phone) : null;
+  const [first, ...rest] = (event.name ?? "").trim().split(/\s+/);
+  const userData: Record<string, unknown> = {};
+  const em = event.email ? hashEmail(event.email) : null;
+  const ph = event.phone ? hashPhone(event.phone) : null;
   const fn = first ? hashName(first) : null;
   const ln = rest.length ? hashName(rest.join(" ")) : null;
   if (em) userData.em = [em];
   if (ph) userData.ph = [ph];
   if (fn) userData.fn = [fn];
   if (ln) userData.ln = [ln];
+  // Not hashed — Meta matches these two verbatim.
+  if (event.fbp) userData.fbp = event.fbp;
+  if (event.fbc) userData.fbc = event.fbc;
+
+  const customData: Record<string, unknown> = { content_name: "Design Express" };
+  if (typeof event.value === "number") customData.value = event.value;
+  if (event.currency) customData.currency = event.currency;
+  if (event.orderId) customData.order_id = event.orderId;
 
   const body: Record<string, unknown> = {
     data: [
       {
-        event_name: "Purchase",
+        event_name: event.eventName,
         event_time: Math.floor(Date.now() / 1000),
-        // Same id on a Stripe retry, so Meta counts the purchase once.
-        event_id: payload.orderId,
+        event_id: event.eventId,
         action_source: "website",
         event_source_url: SOURCE_URL,
         user_data: userData,
-        custom_data: {
-          currency: payload.currency,
-          value: payload.value,
-          content_name: "Design Express",
-          order_id: payload.orderId,
-        },
+        custom_data: customData,
       },
     ],
     access_token: token,
@@ -126,13 +134,13 @@ export async function sendPurchaseEvent(
 
     if (!res.ok || json.error) {
       const detail = json.error?.message || `HTTP ${res.status}`;
-      console.error("[meta-capi] Purchase rejected:", detail);
+      console.error(`[meta-capi] ${event.eventName} rejected:`, detail);
       return { sent: false, detail };
     }
 
     return { sent: (json.events_received ?? 0) > 0 };
   } catch (err) {
-    console.error("[meta-capi] Purchase failed:", err);
+    console.error(`[meta-capi] ${event.eventName} failed:`, err);
     return { sent: false, detail: String(err) };
   }
 }

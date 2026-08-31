@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
+import { sendServerEvent } from "@/lib/meta-capi";
 
 // Needs the Node runtime (crypto + the Supabase admin client).
 export const runtime = "nodejs";
@@ -141,6 +142,48 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "Nu am putut înregistra comanda. Te rugăm încearcă din nou." },
         { status: 500 }
+      );
+    }
+
+    // Server copies of the two browser events, carrying the same ids the
+    // wizard used. Meta discards whichever duplicate arrives second, so an
+    // ad-blocked browser event still gets counted. Failures are logged only:
+    // the order is saved and the customer must not be held up for analytics.
+    const tracking = (body.tracking ?? {}) as {
+      leadEventId?: string;
+      checkoutEventId?: string;
+      fbp?: string | null;
+      fbc?: string | null;
+    };
+    if (tracking.leadEventId || tracking.checkoutEventId) {
+      const shared = {
+        email,
+        phone,
+        name,
+        fbp: tracking.fbp ?? null,
+        fbc: tracking.fbc ?? null,
+        value: 297,
+        currency: "RON",
+        orderId,
+      };
+      const [lead, checkout] = await Promise.all([
+        tracking.leadEventId
+          ? sendServerEvent({
+              ...shared,
+              eventName: "Lead" as const,
+              eventId: tracking.leadEventId,
+            })
+          : Promise.resolve({ sent: false }),
+        tracking.checkoutEventId
+          ? sendServerEvent({
+              ...shared,
+              eventName: "InitiateCheckout" as const,
+              eventId: tracking.checkoutEventId,
+            })
+          : Promise.resolve({ sent: false }),
+      ]);
+      console.log(
+        `[submit-order] Meta server events (order=${orderId}): Lead=${lead.sent} InitiateCheckout=${checkout.sent}`,
       );
     }
 

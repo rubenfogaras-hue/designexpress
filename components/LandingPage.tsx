@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { OFFER_CURRENCY, OFFER_VALUE, trackPixel } from "@/lib/meta-pixel";
 import { TopBar } from "./landing/TopBar";
 import { Hero } from "./landing/Hero";
 import { BeforeAfter } from "./landing/BeforeAfter";
@@ -21,7 +22,16 @@ import { Wizard } from "./landing/Wizard";
 export default function LandingPage() {
   const [wizardOpen, setWizardOpen] = useState(false);
 
-  const openWizard = useCallback(() => setWizardOpen(true), []);
+  // Every CTA on the page routes through here, so this is the one place that
+  // knows someone showed intent — whichever button they pressed.
+  const openWizard = useCallback(() => {
+    trackPixel("ViewContent", {
+      content_name: "Design Express",
+      value: OFFER_VALUE,
+      currency: OFFER_CURRENCY,
+    });
+    setWizardOpen(true);
+  }, []);
   const closeWizard = useCallback(() => setWizardOpen(false), []);
 
   return (

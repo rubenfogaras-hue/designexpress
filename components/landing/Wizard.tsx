@@ -2,6 +2,13 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
+import {
+  OFFER_CURRENCY,
+  OFFER_VALUE,
+  newEventId,
+  readMetaCookies,
+  trackPixel,
+} from "@/lib/meta-pixel";
 import { PhotoTipsModal } from "./PhotoTipsModal";
 
 /* ────────────────────────────────────────────────────────────────────────
@@ -208,6 +215,13 @@ export function Wizard({ onClose }: { onClose: () => void }) {
         file: photos[r.key]!.file,
       }));
 
+      // One id per event, shared with the server copy sent from the API route.
+      // Meta keeps whichever arrives first and drops the duplicate, so an
+      // ad-blocked browser event is still recorded.
+      const leadEventId = newEventId();
+      const checkoutEventId = newEventId();
+      const { fbp, fbc } = readMetaCookies();
+
       // The green/red split was derived from the old budget question (q4),
       // which the questionnaire no longer asks. Nothing is sent, so the API
       // falls back to its "red" default until a new signal replaces it.
@@ -222,6 +236,7 @@ export function Wizard({ onClose }: { onClose: () => void }) {
           consent,
           answers,
           photos: selected.map(({ room, file }) => ({ room, type: file.type })),
+          tracking: { leadEventId, checkoutEventId, fbp, fbc },
         }),
       });
 
@@ -234,6 +249,19 @@ export function Wizard({ onClose }: { onClose: () => void }) {
 
       const { orderId, uploads } = await res.json();
       if (!orderId) throw new Error("Comanda nu a putut fi înregistrată.");
+
+      // The details are stored — this is the lead. Fired before the photo
+      // upload so it still counts if that step fails; the contact information
+      // is ours either way.
+      trackPixel(
+        "Lead",
+        {
+          value: OFFER_VALUE,
+          currency: OFFER_CURRENCY,
+          content_name: "Design Express",
+        },
+        leadEventId,
+      );
 
 
       const supabase = getSupabaseBrowser();
@@ -253,6 +281,18 @@ export function Wizard({ onClose }: { onClose: () => void }) {
         );
       }
 
+
+      // Everything landed; they are on their way to pay.
+      trackPixel(
+        "InitiateCheckout",
+        {
+          value: OFFER_VALUE,
+          currency: OFFER_CURRENCY,
+          content_name: "Design Express",
+          num_items: ROOMS.length,
+        },
+        checkoutEventId,
+      );
 
       const payUrl = new URL(STRIPE_PAYMENT_LINK);
       payUrl.searchParams.set("client_reference_id", orderId);
