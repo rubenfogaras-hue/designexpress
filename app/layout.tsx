@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 /**
@@ -43,12 +42,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ro" className={`${cormorant.variable} ${inter.variable}`}>
-      <body className="font-sans">
-        {/* beforeInteractive puts this in <head> of the served HTML, which is
-            where Meta's installation check looks for it. afterInteractive
-            works for real visitors but their crawler can miss it. */}
-        <Script id="meta-pixel" strategy="beforeInteractive">
-          {`!function(f,b,e,v,n,t,s)
+      {/* Rendered before <body>, so the HTML parser places it in <head> —
+          which is literally what Meta's install instructions ask for, and
+          where their verification check looks. next/script would not do
+          this: even at beforeInteractive it emits the tag into the body,
+          which made Meta report the pixel as not installed. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `!function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
 if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
@@ -57,8 +58,10 @@ t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '${META_PIXEL_ID}');
-fbq('track', 'PageView');`}
-        </Script>
+fbq('track', 'PageView');`,
+        }}
+      />
+      <body className="font-sans">
         <noscript>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
