@@ -207,24 +207,6 @@ read it as live lead scoring.
   signed URLs; public anon key in the browser only to PUT to a signed URL.
 - **Titan (via GoDaddy)** — the `info@rubenhorizontvisual.com` mailbox, over SMTP
   at `smtpout.secureserver.net`.
-- **Meta** — pixel `1456331533029480`, installed in `app/layout.tsx` via
-  `next/script`. Events:
-
-  | Event | Fires | Where |
-  | --- | --- | --- |
-  | `PageView` | page load | `app/layout.tsx` |
-  | `Lead` | order stored in Supabase | `Wizard.tsx` |
-  | `InitiateCheckout` | redirect to Stripe | `Wizard.tsx` |
-  | `Purchase` | Stripe confirms payment | `app/api/stripe-webhook/route.ts` |
-
-  `Purchase` goes through the **Conversions API**, not the browser: payment
-  completes on Stripe, so the pixel never sees it. Value comes from
-  `amount_total`, so the cross-sell is included. `event_id` is the order id, so
-  a Stripe retry cannot double-count. Contact details are SHA-256 hashed, phone
-  normalised to E.164 first.
-
-  **Do not add button-click events in the Event Setup Tool.** They would
-  duplicate these, and a click on the pay button is not a purchase.
 
 ## Environment variables
 
@@ -232,10 +214,6 @@ See `.env.example`. All of these are read by the code:
 
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` — server-only.
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — browser upload only.
-- `META_PIXEL_ID`, `META_CAPI_TOKEN` — server-only, for the Purchase event.
-  `META_TEST_EVENT_CODE` is optional and for testing only: setting it routes
-  events to the Test Events view instead of live reporting, so never leave it
-  set in production.
 - `STRIPE_WEBHOOK_SECRET` — verifies the webhook signature.
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` — the confirmation email.
 
