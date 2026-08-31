@@ -10,7 +10,7 @@ import "./globals.css";
  * present on the page in order to run at all. Do not add fbq('track', ...)
  * calls here: they would double-count against the events configured there.
  */
-const META_PIXEL_ID = "1456331533029480";
+const META_PIXEL_ID = "1901960714520507";
 
 // Display / headings — serif, light weights, italic emphasis on a key word.
 const cormorant = Cormorant_Garamond({
