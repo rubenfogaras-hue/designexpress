@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
       value:
         typeof session.amount_total === "number"
           ? session.amount_total / 100
-          : 297,
+          : 497,
       currency: (session.currency || "ron").toUpperCase(),
     });
     console.log(

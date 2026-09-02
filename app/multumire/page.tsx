@@ -81,7 +81,7 @@ export default function ThankYou() {
             color: "#3d4255",
           }}
         >
-          Am primit comanda și pozele tale. Îți pregătesc cele patru camere în
+          Am primit comanda și pozele tale. Îți pregătesc cele două camere în
           stil clasic-contemporan și te sun cât mai curând posibil, într-o zi
           lucrătoare (luni–vineri), ca să stabilim împreună ziua și ora
           discuției live de 20 de minute.
@@ -108,7 +108,7 @@ export default function ThankYou() {
                 fontSize: 16,
               }}
             >
-              297 lei
+              497 lei
             </span>{" "}
             se scad din proiectul complet — vorbim despre asta în discuția live.
           </p>

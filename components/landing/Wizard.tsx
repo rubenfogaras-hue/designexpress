@@ -14,28 +14,27 @@ import { PhotoTipsModal } from "./PhotoTipsModal";
 /* ────────────────────────────────────────────────────────────────────────
    The three-step order wizard.
 
-   1. All four room photos (every one required).
+   1. Both room photos (every one required).
    2. Three qualifying questions, asked one at a time, plus an optional note.
    3. Name, email, phone, consent — then pay.
 
-   On submit it POSTs the order to /api/submit-order, uploads the four photos
+   On submit it POSTs the order to /api/submit-order, uploads the two photos
    straight to Supabase Storage with the signed URLs it gets back, and only
    then hands off to the Stripe Payment Link. Uploads must finish first:
    navigating away cancels anything still in flight.
 ──────────────────────────────────────────────────────────────────────── */
 
-const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/6oU5kw5HhbnEakT5Pl3F602";
+const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/cNi9AM2v5bnEgJhcdJ3F605";
 const BUCKET = "design-express-photos";
 const NOTE_LIMIT = 300;
 
 /* Deliberately generic. The slots used to be Living / Bucătărie / Dormitor /
    Baie, which turned people away when the rooms they wanted redesigned were a
-   dining room, an office or two bedrooms. Four slots, any four rooms. */
+   dining room, an office or two bedrooms. Two slots, any two rooms.
+   ROOM_KEYS in /api/submit-order must always list exactly these keys. */
 const ROOMS = [
   { key: "camera1", label: "Camera 1" },
   { key: "camera2", label: "Camera 2" },
-  { key: "camera3", label: "Camera 3" },
-  { key: "camera4", label: "Camera 4" },
 ] as const;
 type RoomKey = (typeof ROOMS)[number]["key"];
 
@@ -89,7 +88,7 @@ const QUESTIONS: readonly Question[] = [
 ];
 
 const STEP_TITLES: Record<number, string> = {
-  1: "Cele patru camere",
+  1: "Cele două camere",
   2: "Câteva întrebări",
   3: "Date & plată",
 };
@@ -344,7 +343,7 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                 lineHeight: 1,
               }}
             >
-              <span style={{ color: "var(--gold-300)" }}>Începe acum</span> — 297
+              <span style={{ color: "var(--gold-300)" }}>Începe acum</span> — 497
               lei.
             </span>
             <button
@@ -450,7 +449,7 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                         letterSpacing: "-0.01em",
                       }}
                     >
-                      Cele patru camere
+                      Cele două camere
                     </h3>
                     <span
                       style={{
@@ -460,7 +459,7 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                         fontStyle: "italic",
                       }}
                     >
-                      {photoCount}/4 incluse
+                      {photoCount}/{ROOMS.length} incluse
                     </span>
                   </div>
 
@@ -472,8 +471,8 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                       lineHeight: 1.55,
                     }}
                   >
-                    Orice patru camere vrei — living, dining, dormitor,
-                    birou, baie. Toate patru sunt necesare.{" "}
+                    Orice două camere vrei — living, dining, dormitor,
+                    birou, baie. Amândouă sunt necesare.{" "}
                     <button
                       type="button"
                       onClick={() => setTipsOpen(true)}
@@ -1118,7 +1117,7 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                           fontSize: 26,
                         }}
                       >
-                        297 lei
+                        497 lei
                       </span>
                     </div>
 
@@ -1138,7 +1137,7 @@ export function Wizard({ onClose }: { onClose: () => void }) {
                     >
                       {submitting
                         ? "Se redirecționează către plată…"
-                        : "Vreau să-mi văd casa — 297 lei"}
+                        : "Vreau să-mi văd casa — 497 lei"}
                     </button>
                     <p
                       style={{

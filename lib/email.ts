@@ -49,7 +49,7 @@ function buildEmail(name: string, fromAddress: string) {
 
 Îți mulțumesc pentru comandă — plata a fost confirmată.
 
-Îți pregătesc cele patru camere transformate în stil clasic-contemporan. Te voi contacta cât mai curând posibil, în timpul zilelor lucrătoare (luni–vineri), la numărul de telefon lăsat, ca să stabilim împreună ziua și ora discuției live de 20 de minute. Acolo îți prezint designul și îți răspund la orice întrebare.
+Îți pregătesc cele două camere transformate în stil clasic-contemporan. Te voi contacta cât mai curând posibil, în timpul zilelor lucrătoare (luni–vineri), la numărul de telefon lăsat, ca să stabilim împreună ziua și ora discuției live de 20 de minute. Acolo îți prezint designul și îți răspund la orice întrebare.
 
 Nu trebuie să faci nimic acum — doar ține telefonul aproape.
 
@@ -77,7 +77,7 @@ ${fromAddress}`;
                 Îți mulțumesc pentru comandă — plata a fost confirmată.
               </p>
               <p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#3d4255;">
-                Îți pregătesc cele patru camere transformate în stil clasic-contemporan. Te voi contacta <strong style="color:#1a1d2c;">cât mai curând posibil, în timpul zilelor lucrătoare (luni–vineri)</strong>, la numărul de telefon lăsat, ca să stabilim împreună ziua și ora discuției <em style="color:#b08a4a;">live</em> de 20 de minute. Acolo îți prezint designul și îți răspund la orice întrebare.
+                Îți pregătesc cele două camere transformate în stil clasic-contemporan. Te voi contacta <strong style="color:#1a1d2c;">cât mai curând posibil, în timpul zilelor lucrătoare (luni–vineri)</strong>, la numărul de telefon lăsat, ca să stabilim împreună ziua și ora discuției <em style="color:#b08a4a;">live</em> de 20 de minute. Acolo îți prezint designul și îți răspund la orice întrebare.
               </p>
               <p style="margin:0 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#3d4255;">
                 Nu trebuie să faci nimic acum — doar ține telefonul aproape.

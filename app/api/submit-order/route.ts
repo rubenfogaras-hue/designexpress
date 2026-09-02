@@ -6,7 +6,7 @@ import { sendServerEvent } from "@/lib/meta-capi";
 // Needs the Node runtime (crypto + the Supabase admin client).
 export const runtime = "nodejs";
 
-const ROOM_KEYS = ["camera1", "camera2", "camera3", "camera4"];
+const ROOM_KEYS = ["camera1", "camera2"];
 const QUESTION_KEYS = ["q1", "q2", "q3"];
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": ".jpg",
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    // All four rooms are required — there is nothing to render without them.
+    // Both rooms are required — there is nothing to render without them.
     if (photos.length !== ROOM_KEYS.length) {
       return NextResponse.json(
         { error: `Sunt necesare toate cele ${ROOM_KEYS.length} poze.` },
@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
         name,
         fbp: tracking.fbp ?? null,
         fbc: tracking.fbc ?? null,
-        value: 297,
+        value: 497,
         currency: "RON",
         orderId,
       };

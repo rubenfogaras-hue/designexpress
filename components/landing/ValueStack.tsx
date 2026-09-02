@@ -3,13 +3,18 @@
 import { Reveal } from "../Reveal";
 import { BeforeAfterSlider } from "./BeforeAfterSlider";
 
-/* What's included in the 297 lei. "Dacă le-ai cumpăra separat" below is the sum
-   of these prices — 1.250 lei — so keep the two in step when editing. */
+/* What's included in the 497 lei. "Dacă le-ai cumpăra separat" below is the sum
+   of these prices — 1.750 lei — so keep the two in step when editing. */
 const ITEMS = [
   {
-    title: "Cele 4 camere transformate",
+    title: "Cele 2 camere transformate",
     desc: "Concept vizual fotorealist, în stilul tău — camerele tale, nu o poză de pe Pinterest.",
     price: "400 lei",
+  },
+  {
+    title: "Model 3D",
+    desc: "Modelul 3D al camerelor, ca să vezi spațiul din orice unghi.",
+    price: "500 lei",
   },
   {
     title: "Discuție live",
@@ -34,7 +39,7 @@ const ITEMS = [
   },
 ];
 
-/* Sold separately, on top of the 297 lei — deliberately excluded from the total
+/* Sold separately, on top of the 497 lei — deliberately excluded from the total
    so the price only ever counts what is actually included. */
 /**
  * The paid add-on, sold separately. It mirrors the cross-sell attached to the
@@ -47,8 +52,8 @@ const OPTIONAL = {
   price: "97 lei",
 };
 
-const TOTAL = "1.250 lei";
-const TODAY = "297";
+const TOTAL = "1.750 lei";
+const TODAY = "497";
 
 /** Numbered badge — navy for what's included, gold for the add-on. */
 function Badge({ n, tone }: { n: number | string; tone: "navy" | "gold" }) {
@@ -151,7 +156,7 @@ function Row({
  * The offer — a numbered value stack on ivory: every included item with its
  * standalone value struck through, what the lot would cost separately, then a
  * navy block with today's price and the CTA. The one add-on that is *not* part
- * of the 297 lei sits below that block, clearly fenced off, and is excluded
+ * of the 497 lei sits below that block, clearly fenced off, and is excluded
  * from both the total and the savings figure.
  */
 export function ValueStack({ onStart }: { onStart: () => void }) {

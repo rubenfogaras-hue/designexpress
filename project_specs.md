@@ -3,16 +3,16 @@
 _The blueprint. Read this and `CLAUDE.MD` before changing anything._
 
 > **Status:** live. This file describes what is actually in the code as of
-> 2026-08-06 — not a plan. If you change the code, change this too.
+> 2026-09-02 — not a plan. If you change the code, change this too.
 
 ## What the app does & who uses it
 
 A single-page **landing page + order funnel** for Horizont Visuals, an interior-design
-studio in Târgu Mureș. A homeowner planning a renovation uploads photos of their four
-rooms, answers three short qualifying questions, pays **297 lei**, and receives
+studio in Târgu Mureș. A homeowner planning a renovation uploads photos of two
+rooms, answers three short qualifying questions, pays **497 lei**, and receives
 photorealistic redesigns in classic-contemporary style — presented **live on a call**.
 
-- **Visitor** → reads the page, opens the wizard, uploads 4 photos, answers 3
+- **Visitor** → reads the page, opens the wizard, uploads 2 photos, answers 3
   questions, enters contact details, pays via Stripe.
 - **Studio (Ruben)** → receives the order, photos, answers and phone number;
   calls the customer to schedule the live presentation.
@@ -59,11 +59,11 @@ touch, tap-to-jump and arrow keys all work. Roughly 95% of traffic is mobile,
 and the slider halves the height each pair used to take.
 
 **Happy path:** land on `/` → click any CTA → wizard opens →
-**Step 1** upload all 4 room photos (generic slots — see below) →
+**Step 1** upload both room photos (generic slots — see below) →
 **Step 2** answer 3 questions one at a time (q2 is free text), optional 300-char note →
 **Step 3** name, email, phone, consent → click pay →
 `POST /api/submit-order` saves the order and returns one signed upload URL per photo →
-browser uploads the 4 photos straight to Supabase Storage →
+browser uploads the 2 photos straight to Supabase Storage →
 redirect to the Stripe Payment Link (`client_reference_id` = orderId) →
 customer pays → Stripe shows its own hosted confirmation → the webhook emails the
 customer.
@@ -72,44 +72,49 @@ customer.
 in the wizard. Upload failure blocks the redirect to Stripe (never take money for an
 order with no photos). Stripe failure leaves the order row in place, unpaid.
 
-## The four room slots
+## The two room slots
 
-The wizard's slots are **generic**: `camera1`…`camera4`, labelled "Camera 1"…
-"Camera 4". They used to be Living / Bucătărie / Dormitor / Baie, which lost
+The wizard's slots are **generic**: `camera1` and `camera2`, labelled "Camera 1"
+and "Camera 2". They used to be Living / Bucătărie / Dormitor / Baie, which lost
 customers whose rooms were a dining room, an office or a second bedroom.
 
-The customer picks any four rooms. The keys are the filenames in Storage
+The customer picks any two rooms. The keys are the filenames in Storage
 (`<orderId>/camera1.jpg`) and are validated by `ROOM_KEYS` in
 `app/api/submit-order/route.ts` — **wizard and API must always agree.**
 
-Orders placed before 2026-08-27 have the old `living/bucatarie/dormitor/baie`
-paths; nothing migrates them, and nothing needs to.
+The offer dropped from four rooms to two on 2026-09-02, alongside the move to
+497 lei. Orders placed before 2026-08-27 have the old
+`living/bucatarie/dormitor/baie` paths, and orders between then and 2026-09-02
+have four `cameraN` paths; nothing migrates them, and nothing needs to.
 
 The before/after photos on the page still carry real room names (Dormitor,
 Living, Bucătărie, Baie) — those are Ruben's own finished projects, not slots.
 
 ## The offer (single source of truth: the code)
 
-**297 lei.** The number appears in `Wizard.tsx` (header, total, pay button),
+**497 lei.** The number appears in `Wizard.tsx` (header, total, pay button),
 `ValueStack.tsx` (price block + CTA), `SiteFooter.tsx` (CTA), `app/layout.tsx`
-(meta description) and `app/multumire/page.tsx`. Change all of them together.
+(meta description) and `app/multumire/page.tsx`. It is also the Meta event value
+in `lib/meta-pixel.ts` (`OFFER_VALUE`), `app/api/submit-order/route.ts` and the
+fallback in `app/api/stripe-webhook/route.ts`. Change all of them together.
 
-The value stack (`ValueStack.tsx`) lists five **included** items:
+The value stack (`ValueStack.tsx`) lists six **included** items:
 
 | # | Item | Value |
 | --- | --- | --- |
-| 1 | Cele 4 camere transformate | 400 lei |
-| 2 | Discuție live *(highlighted row)* | 500 lei |
-| 3 | Moodboard | 200 lei |
-| 4 | Harta luminii | 100 lei |
-| 5 | Prezentarea interiorului făcut | 50 lei |
-| | **Dacă le-ai cumpăra separat** | **1.250 lei** |
+| 1 | Cele 2 camere transformate | 400 lei |
+| 2 | Model 3D | 500 lei |
+| 3 | Discuție live *(highlighted row)* | 500 lei |
+| 4 | Moodboard | 200 lei |
+| 5 | Harta luminii | 100 lei |
+| 6 | Prezentarea interiorului făcut | 50 lei |
+| | **Dacă le-ai cumpăra separat** | **1.750 lei** |
 
 Each item has a numbered navy badge, a bold title, a muted one-line description
 and its standalone value struck through. Below the list: "Dacă le-ai cumpăra
-separat 1.250 lei" struck, then a navy block — "Prețul tău azi", **297 lei** —
+separat 1.750 lei" struck, then a navy block — "Prețul tău azi", **497 lei** —
 and the gold CTA. There is no savings line: it was removed on Ruben's request,
-so the discount reads from the struck 1.250 against the price directly below it.
+so the discount reads from the struck 1.750 against the price directly below it.
 
 The card itself is ivory (`--canvas`) on the navy section, so it reads as a
 printed page laid on the dark band.
@@ -117,8 +122,8 @@ printed page laid on the dark band.
 Below the navy block sits one **optional add-on, sold separately** — "Ideile
 Tale pe Plan", +97 lei, on a tinted strip headed "Opțional · nu e inclus în preț",
 with a gold `+` badge and its price **not** struck through. It is deliberately
-**excluded** from the 1.250 lei total and from the savings figure, because it is
-not part of what 297 lei buys. Keep it that way: the struck-through total must
+**excluded** from the 1.750 lei total and from the savings figure, because it is
+not part of what 497 lei buys. Keep it that way: the struck-through total must
 only ever be the sum of the included items.
 
 If you change any item price, recompute `TOTAL` (the sum of `ITEMS`). It must
@@ -200,8 +205,8 @@ read it as live lead scoring.
 
 ## Third-party services
 
-- **Stripe** — Payment Link `https://buy.stripe.com/6oU5kw5HhbnEakT5Pl3F602`
-  (297 RON, live), hard-coded in `components/landing/Wizard.tsx`. Set to
+- **Stripe** — Payment Link `https://buy.stripe.com/cNi9AM2v5bnEgJhcdJ3F605`
+  (497 RON, live), hard-coded in `components/landing/Wizard.tsx`. Set to
   `hosted_confirmation`. No Stripe API key is used anywhere in the app.
 - **Supabase** — Postgres + Storage. Server-side `service_role` key for writes and
   signed URLs; public anon key in the browser only to PUT to a signed URL.
@@ -240,11 +245,24 @@ They must be set both in `.env.local` (for `npm run dev`) and on Vercel
 - **Still to delete** (blocked on permission, do it manually): the dead v1
   `components/OptInPage.tsx`, and the `uploads/` folder of v1 test orders.
 
+## Offer change (2026-09-02)
+
+- Four room slots → **two** (`camera1`, `camera2`) in the wizard and in
+  `ROOM_KEYS`. All customer-facing copy follows: wizard step 1, FAQ, "Cum
+  funcționează", the meta description, `/multumire` and the confirmation email.
+- **Model 3D** added to the value stack at 500 lei, sitting second — right after
+  the rooms, before the highlighted live call. `TOTAL` recomputed: 1.750 lei.
+- Price **297 → 497 lei**, with a new Payment Link
+  (`cNi9AM2v5bnEgJhcdJ3F605`). The Meta event value moved with it in
+  `lib/meta-pixel.ts`, `api/submit-order` and the `api/stripe-webhook` fallback.
+- The 97 lei "Ideile Tale pe Plan" cross-sell is unchanged and still excluded
+  from the 1.750 total.
+
 ## What "done" looks like for any change
 
 - `npm run build` passes with no TypeScript errors.
 - `npm run dev` → the page renders every section, no console errors.
-- The wizard still gates: 4 photos → 6 answers → name + valid email + 9-digit
+- The wizard still gates: 2 photos → 3 answers → name + valid email + 9-digit
   phone + consent.
 - Price is identical in every place listed under "The offer".
 - The phone-call promise is identical in the wizard, the email and `/multumire`.

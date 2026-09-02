@@ -11,7 +11,7 @@ import { section } from "./styles";
 const FAQ = [
   {
     q: "Ce primesc, mai exact?",
-    a: "Patru camere la alegerea ta — transformate în stil clasic-contemporan, pe care ți le prezint live (sau pe email, în funcție de proiect).",
+    a: "Două camere la alegerea ta — transformate în stil clasic-contemporan, pe care ți le prezint live (sau pe email, în funcție de proiect).",
   },
   {
     q: "Este un plan de execuție?",
@@ -19,7 +19,7 @@ const FAQ = [
   },
   {
     q: "Câte camere trimit și care?",
-    a: "Patru, și alegi tu care sunt: living, dining, dormitor, birou, baie, bucătărie — orice combinație vrei. Toate patru sunt necesare.",
+    a: "Două, și alegi tu care sunt: living, dining, dormitor, birou, baie, bucătărie — orice combinație vrei. Amândouă sunt necesare.",
   },
   {
     q: "Ce se întâmplă după?",

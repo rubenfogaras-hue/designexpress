@@ -7,7 +7,7 @@ const STEPS = [
   {
     num: "01",
     title: "Trimiți pozele",
-    before: "Cele patru camere, ",
+    before: "Cele două camere, ",
     em: "direct de pe telefon",
     after: ".",
   },

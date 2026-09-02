@@ -15,7 +15,7 @@ declare global {
   }
 }
 
-export const OFFER_VALUE = 297;
+export const OFFER_VALUE = 497;
 export const OFFER_CURRENCY = "RON";
 
 /** A shared id lets Meta discard the duplicate when both copies arrive. */
